@@ -57,6 +57,11 @@ export default function Login() {
     setPassword(e.target.value);
   }
 
+  function showMessage(msg){
+    setMessage(msg);
+    setTimeout(()=>{setMessage(null)}, 2500)
+  }
+
   async function handleLogin(e) {
     e.preventDefault();
     if (user != null && user != "" && password != null && password != "") {
@@ -81,12 +86,18 @@ export default function Login() {
           saveToken(json.token);
           setEmpresa(json.empresa);
           setNombreEmpleado(json.nombre);
-          setMessage("Inicio exitoso, redirigiendo...");
+          showMessage("Inicio exitoso, redirigiendo...");
           setTimeout(() => {
             router.push("/");
           }, 3000);
         }
+        else{
+          showMessage(json.error)
+        }
       }
+    }
+    else{
+      showMessage('Rellena todos los campos.')
     }
   }
 
