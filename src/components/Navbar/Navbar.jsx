@@ -66,7 +66,7 @@ export default function Navbar() {
             {privilegios == "gerente" && <Link className="text-center hover:italic hover:font-bold" href="" >Operadores</Link>}
             {(privilegios == "gerente" | privilegios =='operador') ? <Link href="/empleados" className="text-center hover:italic hover:font-bold"> Empleados</Link> : ''}
             {(privilegios == "gerente") | (privilegios == "operador") ? (
-              <Link href="" className="text-center hover:italic hover:font-bold">Quejas y sugerencias</Link>
+              <Link href="/quejas-y-sugerencias" className="text-center hover:italic hover:font-bold">Quejas y sugerencias</Link>
             ) : (
               ""
             )}
@@ -114,7 +114,7 @@ export default function Navbar() {
         {privilegios == "gerente" && <Link href="" className="text-center hover:italic hover:font-bold">Operadores</Link>}
         {(privilegios == "gerente" | privilegios =='operador') ? <Link href="/empleados" className="text-center hover:italic hover:font-bold"> Empleados</Link> : ''}
         {(privilegios == "gerente") | (privilegios == "operador") ? (
-          <Link href="" className="text-center hover:italic hover:font-bold">Quejas y sugerencias</Link>
+          <Link href="/quejas-y-sugerencias" className="text-center hover:italic hover:font-bold">Quejas y sugerencias</Link>
         ) : (
           ""
         )}

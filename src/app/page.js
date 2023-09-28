@@ -43,7 +43,7 @@ export default function Home({ children }) {
           ""
         )}
         {(privilegios == "gerente") | (privilegios == "operador") ? (
-          <Link href="" className="text-center hover:italic hover:font-bold">
+          <Link href="/quejas-y-sugerencias" className="text-center hover:italic hover:font-bold">
             Ver quejas y sugerencias
           </Link>
         ) : (

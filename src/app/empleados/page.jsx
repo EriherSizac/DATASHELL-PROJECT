@@ -127,7 +127,7 @@ export default function GestionEmpleados() {
     <div className="flex flex-col content-center items-start gap-5 min-h-screen justify-start pt-24">
       <div className="container mx-auto py-10">
         {errorMessage != null && <div>{errorMessage}</div>}
-        {empleados != null && <DataTable columns={columns} data={empleados} headerTitle={'Empleados activos'} headerDesc='Estos son todos los empleados dados de alta.' ctaDesc='Nuevo empleado' ctaLink='/empleado/nuevo' ctaPriv='operador' filter_placeholder={'Buscar por RFC'} filter_key={"rfc"}/>}
+        {empleados != null && <DataTable columns={columns} data={empleados} headerTitle={'Empleados activos'} headerDesc='Estos son todos los empleados dados de alta.' ctaVisible={true} ctaDesc='Nuevo empleado' ctaLink='/empleados/nuevo' ctaPriv={['operador']} filter_placeholder={'Buscar por RFC'} filter_key={"rfc"}/>}
       </div>
     </div>
   );

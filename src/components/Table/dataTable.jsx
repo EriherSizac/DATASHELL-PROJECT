@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "../AuthComponent";
 import Link from "next/link";
 
-export function DataTable({ columns, data, headerTitle, headerDesc, ctaDesc, ctaLink, ctaPriv, filter_placeholder, filter_key}) {
+export function DataTable({ columns, data, headerTitle, headerDesc, ctaDesc, ctaLink, ctaPriv, ctaVisible, filter_placeholder, filter_key}) {
   // and now we will use this useReactTable hook
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
@@ -68,7 +68,7 @@ export function DataTable({ columns, data, headerTitle, headerDesc, ctaDesc, cta
             <div>{headerDesc}</div>
           </div>
           <div>
-            {privilegios == ctaPriv && (
+            {ctaPriv.indexOf(privilegios) != -1 && ctaVisible && (
               <Link
                 href={ctaLink}
                 className="block bg-black text-white rounded p-3 w-max cursor-pointer"

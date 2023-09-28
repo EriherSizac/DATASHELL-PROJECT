@@ -16,6 +16,10 @@
   }
 }
 
+.body-no-scroll {
+  overflow: hidden;
+}
+
 .w-checkbox {
   margin-bottom: 5px;
   padding-left: 20px;
