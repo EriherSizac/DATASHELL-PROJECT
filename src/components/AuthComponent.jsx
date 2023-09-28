@@ -81,7 +81,7 @@ export function AuthProvider({ children }) {
     setInterval(() => {
       checkAuth();
       console.log("checked");
-    }, 60000);
+    }, 300000);
   }, []);
 
   return (
