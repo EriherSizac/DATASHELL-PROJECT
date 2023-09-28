@@ -66,6 +66,7 @@ export function AuthProvider({ children }) {
     }
   }
 
+
   async function closeSession() {
     localStorage.removeItem("authToken");
     setAuthToken(null);
@@ -96,7 +97,7 @@ export function AuthProvider({ children }) {
         saveToken,
         setPrivilegios,
         closeSession,
-        checkAuth,
+        checkAuth
       }}
     >
       {children}
