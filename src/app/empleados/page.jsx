@@ -16,7 +16,7 @@ export default function GestionEmpleados() {
   async function getEmpleados() {
     var url =
       process.env.NEXT_PUBLIC_backEnd +
-      "operador/obtener-empleados?filtro=alfabetico&reverse=true";
+      "operador/obtener-empleados?filtro=fecha&reverse=true";
     const response = await fetch(url, {
       method: "GET",
       headers: {
