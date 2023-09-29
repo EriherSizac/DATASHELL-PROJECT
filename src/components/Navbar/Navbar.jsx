@@ -46,7 +46,7 @@ export default function Navbar() {
             empresa != null ? `| ${empresa}` : ""
           }`}</div>
         </div>
-        <div className="flex flex-row justify-evenly max-width-ful hidden md:block">
+        <div className="flex flex-row justify-evenly max-width-ful hidden lg:block">
           <div className="flex flex-row justify-between gap-4 items-center">
             {privilegios == "gerente" && (
               <Link className="text-center hover:text-yellow-400" href="">
@@ -93,7 +93,7 @@ export default function Navbar() {
         </div>
         {authToken != null && (
           <button
-            className="bg-black text-white p-2 min-w-fit hidden md:block"
+            className="bg-black text-white p-2 min-w-fit hidden lg:block"
             onClick={endSession}
           >
             Cerrar sesión
@@ -101,7 +101,7 @@ export default function Navbar() {
         )}
         {authToken != null ? (
           <div
-            className="bg-black text-white px-3 py-2 min-w-fit cursor-pointer md:hidden"
+            className="bg-black text-white px-3 py-2 min-w-fit cursor-pointer lg:hidden"
             onClick={toggleNavigationPanel}
           >
             Menú
@@ -118,7 +118,7 @@ export default function Navbar() {
       <div
         className={`${mobileNavVisibility} absolute z-50 flex-col justify-top pt-20 gap-4 items-center absolute inset-0 bg-black text-white`}
       >
-        <MenuPrincipal onclick={toggleNavigationPanel}/>
+        <MenuPrincipal onclick={toggleNavigationPanel} />
         <div
           className="absolute top-0 right-0 pr-3 pt-3 cursor-pointer"
           onClick={toggleNavigationPanel}
@@ -138,8 +138,6 @@ export default function Navbar() {
             ></path>
           </svg>
         </div>
-
-        
       </div>
     </div>
   );
