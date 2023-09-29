@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useAuth } from "@/components/AuthComponent";
+import MenuPrincipal from "../MenuPrincipal";
 
 export default function Navbar() {
   const [mobileNavVisibility, setMobileNavVisibility] = useState("hidden");
@@ -20,13 +21,13 @@ export default function Navbar() {
   }
 
   function endSession() {
-    setMobileNavVisibility("hidden");
+    onclick();
     closeSession();
   }
 
   return (
     <div>
-      <div className="bg-white absolute w-full pt-5 pb-3 flex flex-row justify-between gap-7 border-b border-black px-10 items-center">
+      <div className="bg-white z-50 absolute w-full pt-5 pb-3 flex flex-row justify-between gap-7 border-b border-black px-10 items-center">
         <div
           className="max-h-10 max-w-0-xs flex flex-row min-w-fit cursor-pointer"
           onClick={() => {
@@ -34,30 +35,28 @@ export default function Navbar() {
           }}
         >
           <Image
+            priority
             className="w-28"
             src="/logo.jpg"
             width="500"
             alt="Din express logo"
             height={250}
           />
-          <div className="ps-2.5">{`${
+          <div className="ps-2.5 hidden sm:block">{`${
             empresa != null ? `| ${empresa}` : ""
           }`}</div>
         </div>
         <div className="flex flex-row justify-evenly max-width-ful hidden md:block">
           <div className="flex flex-row justify-between gap-4 items-center">
             {privilegios == "gerente" && (
-              <Link
-                className="text-center hover:italic hover:font-bold"
-                href=""
-              >
+              <Link className="text-center hover:text-yellow-400" href="">
                 Operadores
               </Link>
             )}
             {(privilegios == "gerente") | (privilegios == "operador") ? (
               <Link
                 href="/empleados"
-                className="text-center hover:italic hover:font-bold"
+                className="text-center hover:text-yellow-400"
               >
                 Empleados
               </Link>
@@ -67,7 +66,7 @@ export default function Navbar() {
             {(privilegios == "gerente") | (privilegios == "operador") ? (
               <Link
                 href="/solicitudes"
-                className="text-center hover:italic hover:font-bold"
+                className="text-center hover:text-yellow-400"
               >
                 Ver solicitudes
               </Link>
@@ -77,7 +76,7 @@ export default function Navbar() {
             {(privilegios == "gerente") | (privilegios == "operador") ? (
               <Link
                 href="/quejas-y-sugerencias"
-                className="text-center hover:italic hover:font-bold"
+                className="text-center hover:text-yellow-400"
               >
                 Quejas y sugerencias
               </Link>
@@ -85,10 +84,7 @@ export default function Navbar() {
               ""
             )}
             {privilegios == "gerente" && (
-              <Link
-                href=""
-                className="text-center hover:italic hover:font-bold"
-              >
+              <Link href="" className="text-center hover:text-yellow-400">
                 {" "}
                 Reportes
               </Link>
@@ -120,8 +116,9 @@ export default function Navbar() {
         )}
       </div>
       <div
-        className={`${mobileNavVisibility} flex-col justify-top pt-20 gap-4 items-center absolute inset-0 bg-black text-white`}
+        className={`${mobileNavVisibility} absolute z-50 flex-col justify-top pt-20 gap-4 items-center absolute inset-0 bg-black text-white`}
       >
+        <MenuPrincipal onclick={toggleNavigationPanel}/>
         <div
           className="absolute top-0 right-0 pr-3 pt-3 cursor-pointer"
           onClick={toggleNavigationPanel}
@@ -142,47 +139,7 @@ export default function Navbar() {
           </svg>
         </div>
 
-        {privilegios == "gerente" && (
-          <Link href="" className="text-center hover:italic hover:font-bold">
-            Operadores
-          </Link>
-        )}
-        {(privilegios == "gerente") | (privilegios == "operador") ? (
-          <Link
-            href="/empleados"
-            className="text-center hover:italic hover:font-bold"
-          >
-            {" "}
-            Empleados
-          </Link>
-        ) : (
-          ""
-        )}
-        {(privilegios == "gerente") | (privilegios == "operador") ? (
-          <Link
-            href="/quejas-y-sugerencias"
-            className="text-center hover:italic hover:font-bold"
-          >
-            Quejas y sugerencias
-          </Link>
-        ) : (
-          ""
-        )}
-        {privilegios == "gerente" && (
-          <Link href="" className="text-center hover:italic hover:font-bold">
-            {" "}
-            Reportes
-          </Link>
-        )}
-
-        {authToken != null && (
-          <button
-            className="bg-white text-black p-2 min-w-fit block md:hidden"
-            onClick={endSession}
-          >
-            Cerrar sesión
-          </button>
-        )}
+        
       </div>
     </div>
   );

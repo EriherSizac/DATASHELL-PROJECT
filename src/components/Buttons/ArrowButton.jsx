@@ -1,10 +1,13 @@
 "use client";
 import Link from "next/link";
-export default function ArrowButton({href, text, className}) {
+export default function ArrowButton({ href, text, className }) {
   return (
-    <Link href={href} className={` flex justify-center items-center text-center transition duration-100 hover:italic hover:font-bold hover:text-yellow-400`}>
+    <Link
+      href={href}
+      className={` flex justify-center items-center text-center transition duration-100 hover:italic hover:font-bold hover:text-yellow-400`}
+    >
       <svg
-      className="w-9 h-7"
+        className="w-9 h-7"
         xmlns="http://www.w3.org/2000/svg"
         xmlnsXlink="http://www.w3.org/1999/xlink"
         aria-hidden="true"

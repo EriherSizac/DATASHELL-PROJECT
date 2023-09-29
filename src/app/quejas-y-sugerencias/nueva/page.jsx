@@ -40,7 +40,7 @@ export default function NuevoEmpleado() {
         tipo_usuario: tipoUsuario,
         tipo_ticket: tipoTicket,
         asunto: asunto,
-        descipcion: descripcion,
+        descripcion: descripcion,
         tipo_contacto: tipoContacto,
         contacto: contacto,
       };
@@ -97,7 +97,7 @@ export default function NuevoEmpleado() {
       if (re.test(e.target.value) || e.target.value == "") {
         setContacto(countryCode +'1'+ e.target.value);
       } else {
-        e.target.value = contacto;
+        e.target.value = e.target.value.slice(0,-1);
       }
     } else {
       if (tipoContacto == "correo") {
