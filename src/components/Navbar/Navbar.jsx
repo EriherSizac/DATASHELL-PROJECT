@@ -21,7 +21,6 @@ export default function Navbar() {
   }
 
   function endSession() {
-    onclick();
     closeSession();
   }
 
