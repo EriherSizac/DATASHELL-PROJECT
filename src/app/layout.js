@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
       <body>
         <AuthProvider>
           <Navbar />
-          <div className="px-5">{children}</div>
+          <div className="px-5 bg-yellow-400">{children}</div>
         </AuthProvider>
       </body>
     </html>

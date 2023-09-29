@@ -50,7 +50,7 @@ export function DataTable({ columns, data, headerTitle, headerDesc, ctaDesc, cta
   const { privilegios } = useAuth();
 
   return (
-    <div>
+    <div className="">
       <div className="flex items-center py-4">
         <Input
           placeholder={filter_placeholder}
@@ -58,11 +58,11 @@ export function DataTable({ columns, data, headerTitle, headerDesc, ctaDesc, cta
           onChange={(event) =>
             table.getColumn(filter_key)?.setFilterValue(event.target.value)
           }
-          className="max-w-sm rounded border-slate-700"
+          className="max-w-sm rounded border-slate-700 bg-white"
         />
       </div>
-      <div className="rounded-md border">
-        <div className="rounded-md border flex w-full items-center pr-3">
+      <div className="rounded-xl border overflow-hidden">
+        <div className="rounded-md border flex w-full items-center pr-3 bg-white">
           <div className=" flex flex-col p-3 w-full">
             <h1 className="text-xl bold w-max">{headerTitle}</h1>
             <div>{headerDesc}</div>
@@ -79,7 +79,7 @@ export function DataTable({ columns, data, headerTitle, headerDesc, ctaDesc, cta
           </div>
         </div>
 
-        <div>
+        <div className="bg-white">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

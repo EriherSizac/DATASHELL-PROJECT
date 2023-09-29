@@ -9,7 +9,7 @@ import { useAuth } from "@/components/AuthComponent";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import Modal from "@/components/Modal/Modal";
 
-export default function QuejasYSugerencias() {
+export default function Solicitudes() {
   const [errorMessage, setErrorMessage] = useState(null);
   const [tickets, setTickets] = useState(null);
   const router = useRouter();
@@ -196,12 +196,12 @@ export default function QuejasYSugerencias() {
           <DataTable
             columns={columns}
             data={tickets}
-            headerTitle={"Lista de quejas y sugerencias"}
-            headerDesc="Estas son las quejas y sugerencias que se han recibido"
-            ctaDesc="Dejar queja o sugerencia"
-            ctaVisible={true}
-            ctaLink="/quejas-y-sugerencias/nueva"
-            ctaPriv={["operador", "gerente", "empleado"]}
+            headerTitle={"Solicitudes de empleados"}
+            headerDesc="Estas son las solicitudes de empleados que se han recibido."
+            ctaDesc=""
+            ctaVisible={false}
+            ctaLink=""
+            ctaPriv={[]}
             filter_placeholder={"Buscar por asunto"}
             filter_key={"asunto"}
           />

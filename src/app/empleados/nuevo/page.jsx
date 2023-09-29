@@ -194,7 +194,7 @@ export default function NuevoEmpleado() {
   }, []);
 
   return (
-    <div className="pt-20">
+    <div className="pt-20 pb-10">
       <div className="min-h-screen w-full max-w-3xl flex flex-col gap-4 align-center items-center content-center">
         <div className="flex flex-col gap-4 align-center items-center content-center">
           <h1>Llena el formulario</h1>

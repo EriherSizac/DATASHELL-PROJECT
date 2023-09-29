@@ -26,9 +26,9 @@ export function AuthProvider({ children }) {
   async function checkAuth() {
     const token = localStorage.getItem("authToken");
     setAuthToken(token);
-    if (token == null) {
+    if (token == null && location.pathname != "/quejas-y-sugerencias/nueva") {
       if (location.pathname != "/auth/login") {
-        router.push("/auth/login");
+        router.push("/");
       }
     }
     if (token != null) {
@@ -73,16 +73,12 @@ export function AuthProvider({ children }) {
     setEmpresa(null);
     setPrivilegios(null);
     setNombreEmpleado(null);
-    router.push("/auth/login");
+    router.push("/");
   }
 
   // Obtenemos el nivel de accceso
   useEffect(() => {
     checkAuth();
-    setInterval(() => {
-      checkAuth();
-      console.log("checked");
-    }, 300000);
   }, []);
 
   return (
