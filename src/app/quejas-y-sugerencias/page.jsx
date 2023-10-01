@@ -2,7 +2,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/Table/dataTable";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthComponent";
@@ -21,6 +21,8 @@ export default function QuejasYSugerencias() {
   const tipos_ticket = ["queja", "sugerencia", "otro"];
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [modalHeader, setModalHeader] = useState("");
+  const refRoles = useRef();
+  const refAsuntos = useRef();
 
   async function getQuejas() {
     var url =
@@ -48,6 +50,14 @@ export default function QuejasYSugerencias() {
         setTickets([]);
       }
     }
+  }
+
+  function limpiarFiltros(e){
+    e.preventDefault();
+    setTipoTickets('todos');
+    setTipoUsuarios('todos');
+    refRoles.current.selectedIndex = 0;
+    refAsuntos.current.selectedIndex = 0;
   }
 
   function verDetalle(index) {
@@ -95,7 +105,7 @@ export default function QuejasYSugerencias() {
               </svg>
               {ticket.contacto}
             </Link>
-          ) : (
+          ) : ticket.tipo_contacto == "correo" && (
             <Link
               href={`mailto:${ticket.contacto}`}
               className={` flex justify-left items-left text-center transition duration-100 hover:italic hover:font-bold hover:text-yellow-400`}
@@ -220,7 +230,7 @@ export default function QuejasYSugerencias() {
         <div>
           <div>Filtros adicionales</div>
           <form className="flex gap-4">
-            <select
+            <select ref={refAsuntos}
               className="p-2 cursor-pointer border border-slate-700 rounded"
               onChange={(e) => {
                 handleAsuntos(e);
@@ -235,7 +245,7 @@ export default function QuejasYSugerencias() {
                 );
               })}
             </select>
-            <select
+            <select ref={refRoles}
               className="p-2 cursor-pointer border border-slate-700 rounded"
               onChange={(e) => {
                 handleRoles(e);
@@ -250,6 +260,7 @@ export default function QuejasYSugerencias() {
                 );
               })}
             </select>
+            <button className="p-3 bg-black text-white rounded" onClick={(e)=>limpiarFiltros(e)}>Limpiar filtros</button>
           </form>
         </div>
         {errorMessage != null && <div>{errorMessage}</div>}

@@ -11,7 +11,7 @@ export default function MenuPrincipal({ onclick }) {
   return (
     <>
       {privilegios == "gerente" && (
-        <ArrowButton onClick={onclick} href="" text="Gestionar operadores" />
+        <ArrowButton onClick={onclick} href="/operadores" text="Gestionar operadores" />
       )}
       {(privilegios == "gerente") | (privilegios == "operador") ? (
         <ArrowButton

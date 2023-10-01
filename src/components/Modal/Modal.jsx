@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function Modal({
   isOpen,
@@ -7,13 +7,15 @@ export default function Modal({
   buttonCloseText,
   modalHeader,
   children,
-  sizeW
+  sizeW,
 }) {
-  if (isOpen) {
-    document.body.classList.add("body-no-scroll");
-  } else {
-    document.body.classList.remove("body-no-scroll");
-  }
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("body-no-scroll");
+    } else {
+      document.body.classList.remove("body-no-scroll");
+    }
+  }, []);
 
   return (
     <div
@@ -22,8 +24,14 @@ export default function Modal({
       }`}
     >
       <div className="">
-        <div className={`pb-4 flex flex-col gap-4 align-center items-center justify-center bg-white rounded-xl w-screen ${sizeW ? sizeW : 'max-w-xl'}`}>
-          <div className="w-full bg-yellow-400 rounded-t-xl"><h2 className="text-center p-6">{modalHeader}</h2></div>
+        <div
+          className={`pb-4 flex flex-col gap-4 align-center items-center justify-center bg-white rounded-xl w-screen ${
+            sizeW ? sizeW : "max-w-xl"
+          }`}
+        >
+          <div className="w-full bg-yellow-400 rounded-t-xl">
+            <h2 className="text-center p-6">{modalHeader}</h2>
+          </div>
           {children}
           <button className="p-3 bg-black text-white rounded" onClick={onClose}>
             {buttonCloseText}
