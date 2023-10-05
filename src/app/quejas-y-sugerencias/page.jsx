@@ -52,10 +52,10 @@ export default function QuejasYSugerencias() {
     }
   }
 
-  function limpiarFiltros(e){
+  function limpiarFiltros(e) {
     e.preventDefault();
-    setTipoTickets('todos');
-    setTipoUsuarios('todos');
+    setTipoTickets("todos");
+    setTipoUsuarios("todos");
     refRoles.current.selectedIndex = 0;
     refAsuntos.current.selectedIndex = 0;
   }
@@ -105,29 +105,31 @@ export default function QuejasYSugerencias() {
               </svg>
               {ticket.contacto}
             </Link>
-          ) : ticket.tipo_contacto == "correo" && (
-            <Link
-              href={`mailto:${ticket.contacto}`}
-              className={` flex justify-left items-left text-center transition duration-100 hover:italic hover:font-bold hover:text-yellow-400`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                xmlnsXlink="http://www.w3.org/1999/xlink"
-                aria-hidden="true"
-                role="img"
-                className="w-9 h-7"
-                width="100%"
-                height="100%"
-                preserveAspectRatio="xMidYMid meet"
-                viewBox="0 0 24 24"
+          ) : (
+            ticket.tipo_contacto == "correo" && (
+              <Link
+                href={`mailto:${ticket.contacto}`}
+                className={` flex justify-left items-left text-center transition duration-100 hover:italic hover:font-bold hover:text-yellow-400`}
               >
-                <path
-                  fill="currentColor"
-                  d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5l-8-5V6l8 5l8-5v2z"
-                ></path>
-              </svg>
-              {ticket.contacto}
-            </Link>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlnsXlink="http://www.w3.org/1999/xlink"
+                  aria-hidden="true"
+                  role="img"
+                  className="w-9 h-7"
+                  width="100%"
+                  height="100%"
+                  preserveAspectRatio="xMidYMid meet"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5l-8-5V6l8 5l8-5v2z"
+                  ></path>
+                </svg>
+                {ticket.contacto}
+              </Link>
+            )
           )}
           {ticket.contacto == "" && <div>No solicitó datos de contacto</div>}
         </div>
@@ -172,10 +174,9 @@ export default function QuejasYSugerencias() {
     },
     {
       accessorKey: "tipo_contacto",
-      header:  "Contacto",
+      header: "Contacto",
       cell: (row) => {
         return (
-           
           row.getValue("tipo_contacto").charAt(0).toUpperCase() +
           row.getValue("tipo_contacto").slice(1)
         );
@@ -188,7 +189,9 @@ export default function QuejasYSugerencias() {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >Creado en<ArrowUpDown className="ml-2 h-4 w-4" />
+          >
+            Creado en
+            <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
@@ -228,39 +231,48 @@ export default function QuejasYSugerencias() {
           {verDetalle(selectedIndex)}
         </Modal>
         <div>
-          <div>Filtros adicionales</div>
-          <form className="flex gap-4">
-            <select ref={refAsuntos}
-              className="p-2 cursor-pointer border border-slate-700 rounded"
-              onChange={(e) => {
-                handleAsuntos(e);
-              }}
+          <div className="pb-1">Filtros adicionales</div>
+          <form className="flex flex-row sm:flex-row sm:items-center flex-wrap sm:flex-nowrap sm:justify-start gap-4">
+            <div className="flex flex-row gap-4 w-full">
+              <select
+                ref={refAsuntos}
+                className="p-2 cursor-pointer border border-slate-700 shrink-0 sm:shrink rounded w-[48%] sm:w-full"
+                onChange={(e) => {
+                  handleAsuntos(e);
+                }}
+              >
+                <option value="todos">Todos los asuntos</option>
+                {tipos_ticket.map((usuario, key) => {
+                  return (
+                    <option value={usuario} key={key}>
+                      {usuario.charAt(0).toUpperCase() + usuario.slice(1)}
+                    </option>
+                  );
+                })}
+              </select>
+              <select
+                ref={refRoles}
+                className="p-2 cursor-pointer border border-slate-700 rounded w-[48%] shrink-0 sm:shrink sm:w-full"
+                onChange={(e) => {
+                  handleRoles(e);
+                }}
+              >
+                <option value="todos">Todos los roles</option>
+                {tipos_usuario.map((usuario, key) => {
+                  return (
+                    <option value={usuario} key={key}>
+                      {usuario.charAt(0).toUpperCase() + usuario.slice(1)}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <button
+              className="p-2 bg-black text-white rounded w-full shrink-0 sm:shrink"
+              onClick={(e) => limpiarFiltros(e)}
             >
-              <option value="todos">Todos los asuntos</option>
-              {tipos_ticket.map((usuario, key) => {
-                return (
-                  <option value={usuario} key={key}>
-                    {usuario.charAt(0).toUpperCase() + usuario.slice(1)}
-                  </option>
-                );
-              })}
-            </select>
-            <select ref={refRoles}
-              className="p-2 cursor-pointer border border-slate-700 rounded"
-              onChange={(e) => {
-                handleRoles(e);
-              }}
-            >
-              <option value="todos">Todos los roles</option>
-              {tipos_usuario.map((usuario, key) => {
-                return (
-                  <option value={usuario} key={key}>
-                    {usuario.charAt(0).toUpperCase() + usuario.slice(1)}
-                  </option>
-                );
-              })}
-            </select>
-            <button className="p-3 bg-black text-white rounded" onClick={(e)=>limpiarFiltros(e)}>Limpiar filtros</button>
+              Limpiar
+            </button>
           </form>
         </div>
         {errorMessage != null && <div>{errorMessage}</div>}

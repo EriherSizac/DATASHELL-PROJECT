@@ -1,51 +1,55 @@
 import ArrowButton from "./Buttons/ArrowButton";
 import { useAuth } from "./AuthComponent";
 
-export default function MenuPrincipal({ onclick }) {
+export default function MenuPrincipal({ fun }) {
   const { privilegios, authToken, empresa, closeSession } = useAuth();
   function endSession() {
-    onclick();
+    fun();
     closeSession();
   }
 
   return (
     <>
       {privilegios == "gerente" && (
-        <ArrowButton onClick={onclick} href="/operadores" text="Gestionar operadores" />
+        <div onClick={fun}>
+          <ArrowButton href="/operadores" text="Gestionar operadores" />
+        </div>
       )}
       {(privilegios == "gerente") | (privilegios == "operador") ? (
-        <ArrowButton
-          onClick={onclick}
-          href="/empleados"
-          text={`${
-            privilegios == "operador"
-              ? "Agregar empleados"
-              : privilegios == "gerente" && "Gestionar empleados"
-          }`}
-        />
+        <div onClick={fun}>
+          <ArrowButton
+            href="/empleados"
+            text={`${
+              privilegios == "operador"
+                ? "Agregar empleados"
+                : privilegios == "gerente" && "Gestionar empleados"
+            }`}
+          />
+        </div>
       ) : (
         ""
       )}
       {(privilegios == "gerente") | (privilegios == "operador") ? (
-        <ArrowButton
-          onClick={onclick}
-          href="/solicitudes"
-          text={`Ver solicitudes`}
-        />
+        <div onClick={fun}>
+          <ArrowButton href="/solicitudes" text={`Ver solicitudes`} />
+        </div>
       ) : (
         ""
       )}
       {(privilegios == "gerente") | (privilegios == "operador") ? (
-        <ArrowButton
-          onClick={onclick}
-          href="/quejas-y-sugerencias"
-          text="Ver quejas y sugerencias"
-        />
+        <div onClick={fun}>
+          <ArrowButton
+            href="/quejas-y-sugerencias"
+            text="Ver quejas y sugerencias"
+          />
+        </div>
       ) : (
         ""
       )}
       {privilegios == "gerente" && (
-        <ArrowButton href="" text="Ver reportes" onClick={onclick} />
+        <div onClick={fun}>
+          <ArrowButton href="" text="Ver reportes" />
+        </div>
       )}
 
       {authToken != null && (

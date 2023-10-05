@@ -51,14 +51,14 @@ export function DataTable({ columns, data, headerTitle, headerDesc, ctaDesc, cta
 
   return (
     <div className="">
-      <div className="flex items-center py-4">
+      <div className="flex w-full items-center py-4">
         <Input
           placeholder={filter_placeholder}
           value={(table.getColumn(filter_key)?.getFilterValue()) ?? ""}
           onChange={(event) =>
             table.getColumn(filter_key)?.setFilterValue(event.target.value)
           }
-          className="max-w-sm rounded border-slate-700 bg-white"
+          className="max-w-sm rounded w-full border-slate-700 bg-white"
         />
       </div>
       <div className="rounded-xl border overflow-hidden">
