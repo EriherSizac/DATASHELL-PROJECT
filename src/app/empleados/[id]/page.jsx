@@ -111,7 +111,7 @@ export default function NuevoEmpleado() {
       (banco != "") &
       (direccion != "")
     ) {
-      var url = process.env.NEXT_PUBLIC_backEnd + "operador/create-empleado";
+      var url = process.env.NEXT_PUBLIC_backEnd + "gerente/edit-empleado";
       var authToken = localStorage.getItem("authToken");
       const body = {
         nombre: nombreCompleto,
