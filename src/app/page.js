@@ -25,7 +25,7 @@ export default function Home({ children }) {
         {authToken != null ? (
           <div className="flex flex-col min-w-full">
             <p className="text-xl text-center">Como {privilegios} puedes:</p>
-            <MenuPrincipal onclick={()=>{}}/>
+            <MenuPrincipal />
           </div>
         ) : (
           <div className="flex flex-col min-w-full">

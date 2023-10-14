@@ -2,6 +2,7 @@
 //we have to import a lot of things and here are they
 import * as React from "react";
 import { Input } from "@/components/ui/input";
+import CsvDownloadButton from "react-json-to-csv";
 import {
   ColumnDef,
   flexRender,
@@ -28,10 +29,22 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "../AuthComponent";
 import Link from "next/link";
 
-export function DataTable({ columns, data, headerTitle, headerDesc, ctaDesc, ctaLink, ctaPriv, ctaVisible, filter_placeholder, filter_key}) {
+export function DataTable({
+  columns,
+  data,
+  headerTitle,
+  headerDesc,
+  ctaDesc,
+  ctaLink,
+  ctaPriv,
+  ctaVisible,
+  filter_placeholder,
+  filter_key,
+}) {
   // and now we will use this useReactTable hook
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
+  const[headers, setHeaders] = React.useState([]);
   const table = useReactTable({
     data,
     columns,
@@ -49,12 +62,26 @@ export function DataTable({ columns, data, headerTitle, headerDesc, ctaDesc, cta
   });
   const { privilegios } = useAuth();
 
+  function getRows(){
+    var len = Object.keys(columns) ;
+    var newT = []
+    for (let i = 0; i < len.length; i++) {
+      newT.push(columns[i].accessorKey);
+      
+    }
+    return newT;
+  }
+React.useEffect(() => {
+  setHeaders(getRows());
+}, [])
+
+
   return (
     <div className="">
       <div className="flex w-full items-center py-4">
         <Input
           placeholder={filter_placeholder}
-          value={(table.getColumn(filter_key)?.getFilterValue()) ?? ""}
+          value={table.getColumn(filter_key)?.getFilterValue() ?? ""}
           onChange={(event) =>
             table.getColumn(filter_key)?.setFilterValue(event.target.value)
           }
@@ -67,15 +94,32 @@ export function DataTable({ columns, data, headerTitle, headerDesc, ctaDesc, cta
             <h1 className="text-xl bold w-max">{headerTitle}</h1>
             <div>{headerDesc}</div>
           </div>
-          <div>
-            {ctaPriv.indexOf(privilegios) != -1 && ctaVisible && (
-              <Link
-                href={ctaLink}
-                className="block bg-black text-white rounded p-3 w-max cursor-pointer"
-              >
-                {ctaDesc}
-              </Link>
-            )}
+
+          <div className="flex flex-row gap-4">
+            <div>
+              {ctaPriv.indexOf(privilegios) != -1 && ctaVisible && (
+                <Link
+                  href={ctaLink}
+                  className="block bg-black text-white rounded p-3 w-max cursor-pointer"
+                >
+                  {ctaDesc}
+                </Link>
+              )}
+            </div>
+            <div>
+              {ctaPriv.indexOf(privilegios) != -1 && (
+                <>
+                <div
+                  className="block bg-black text-white rounded p-3 w-max cursor-pointer"
+                  onClick={()=>{document.getElementById('here').click()}}
+                >
+                  Descargar como CSV
+                  
+                </div>
+                <CsvDownloadButton id="here" className="hidden" headers={headers} data={data} filename={headerTitle.csv} delimiter=","/>
+                </>
+              )}
+            </div>
           </div>
         </div>
 

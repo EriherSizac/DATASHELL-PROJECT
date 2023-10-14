@@ -84,7 +84,7 @@ export default function Navbar() {
               ""
             )}
             {privilegios == "gerente" && (
-              <Link href="" className="text-center hover:text-yellow-400">
+              <Link href="/reportes" className="text-center hover:text-yellow-400">
                 {" "}
                 Reportes
               </Link>

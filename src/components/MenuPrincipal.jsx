@@ -4,7 +4,7 @@ import { useAuth } from "./AuthComponent";
 export default function MenuPrincipal({ fun }) {
   const { privilegios, authToken, empresa, closeSession } = useAuth();
   function endSession() {
-    fun();
+    fun && fun();
     closeSession();
   }
 
@@ -48,7 +48,7 @@ export default function MenuPrincipal({ fun }) {
       )}
       {privilegios == "gerente" && (
         <div onClick={fun}>
-          <ArrowButton href="" text="Ver reportes" />
+          <ArrowButton href="/reportes" text="Ver reportes" />
         </div>
       )}
 
