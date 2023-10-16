@@ -1,7 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import Navbar from "@/components/Navbar/Navbar";
-import {AuthProvider} from "@/components/AuthComponent";
+import { AuthProvider } from "@/components/AuthComponent";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,10 +17,23 @@ export default function RootLayout({ children }) {
         <meta charSet="utf-8" />
         <link rel="stylesheet" href="https://use.typekit.net/nhf8asm.css" />
         <title>Din Express</title>
+        <meta
+          name="description"
+          content="Te damos la bienvenida a Din Express."
+          key="desc"
+        />
+        <meta
+          property="og:description"
+          content="Te damos la bienvenida a Din Express."
+        />
+        <meta
+          property="og:image"
+          content="/favicon.png"
+        />
         <link rel="shortcut icon" href="/favicon.ico" />
-          <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png"/>
-          <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png"/>
-          <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png"/>
+        <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png" />
       </head>
       <body>
         <AuthProvider>
