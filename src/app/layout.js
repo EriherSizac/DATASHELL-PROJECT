@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
       <head>
         <meta charSet="utf-8" />
         <link rel="stylesheet" href="https://use.typekit.net/nhf8asm.css" />
-        <title>Datashell</title>
+        <title>Din Express</title>
         <link rel="shortcut icon" href="/favicon.ico" />
           <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png"/>
           <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png"/>
