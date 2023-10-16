@@ -77,7 +77,7 @@ export default function NuevoEmpleado() {
       var authToken = localStorage.getItem("authToken");
       const body = {
         nombre: nombreCompleto,
-        celular: countryCode + "1" + celular,
+        celular: countryCode + celular,
         direccion: direccion,
         rfc: rfc,
         correo: correo,
