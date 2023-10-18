@@ -26,6 +26,7 @@ export default function Solicitudes() {
   const [empleadoNombre, setEmpleadoNombre] = useState("");
   const [empleadoInfo, setEmpleadoInfo] = useState(null);
   const [accionEmpleado, setAccionEmpleado] = useState(-1);
+  const [DatosCsv, setDatosCsv] = useState({})
 
   async function getSolicitudes() {
     var url =
@@ -43,7 +44,8 @@ export default function Solicitudes() {
       const json = await response.json();
       if (response.status == 200) {
         console.log(json);
-        setAdelantos(json);
+        setAdelantos(json.DatosTabla);
+        setDatosCsv(json.DatosCsv);
       } else {
         if (response.status == 401) {
           setIsOpenMOdal(true);
@@ -467,9 +469,10 @@ export default function Solicitudes() {
             headerTitle={"Solicitudes de empleados"}
             headerDesc="Estas son las solicitudes de empleados que se han recibido."
             ctaDesc=""
-            ctaVisible={false}
+            ctaVisible={true}
+            datosDescarga={DatosCsv}
             ctaLink=""
-            ctaPriv={[]}
+            ctaPriv={['gerente', 'operador']}
             filter_placeholder={"Buscar por RFC"}
             filter_key={"rfc"}
           />

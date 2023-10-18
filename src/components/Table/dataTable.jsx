@@ -40,6 +40,7 @@ export function DataTable({
   ctaVisible,
   filter_placeholder,
   filter_key,
+  datosDescarga
 }) {
   // and now we will use this useReactTable hook
   const [sorting, setSorting] = React.useState([]);
@@ -97,7 +98,7 @@ React.useEffect(() => {
 
           <div className="flex flex-row gap-4">
             <div>
-              {ctaPriv.indexOf(privilegios) != -1 && ctaVisible && (
+              {ctaPriv.indexOf(privilegios) != -1 && ctaVisible && ctaLink != '' && (
                 <Link
                   href={ctaLink}
                   className="block bg-black text-white rounded p-3 w-max cursor-pointer"
@@ -116,7 +117,7 @@ React.useEffect(() => {
                   Descargar como CSV
                   
                 </div>
-                <CsvDownloadButton id="here" className="hidden" headers={headers} data={data} filename={headerTitle.csv} delimiter=","/>
+                <CsvDownloadButton id="here" className="hidden" headers={datosDescarga.headers} data={datosDescarga.data} filename={headerTitle+'.csv'} delimiter=","/>
                 </>
               )}
             </div>
