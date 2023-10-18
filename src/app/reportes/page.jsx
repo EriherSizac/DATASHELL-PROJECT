@@ -361,6 +361,7 @@ export default function Reportes() {
           <DataTable
             columns={columns}
             data={datos}
+            datosDescarga={{headers:Object.keys(datos), data:datos}}
             headerTitle={"Reporte"}
             headerDesc="Estos son los detalles del reporte"
             ctaDesc="Dejar queja o sugerencia"

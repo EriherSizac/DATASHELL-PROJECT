@@ -1,15 +1,16 @@
 "use client";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/Table/dataTable";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthComponent";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 export default function GestionEmpleados() {
   const [errorMessage, setErrorMessage] = useState(null);
   const [empleados, setEmpleados] = useState(null);
+  const [csv, setCsv] = useState({});
   const router = useRouter();
   const { privilegios } = useAuth();
 
@@ -29,7 +30,8 @@ export default function GestionEmpleados() {
       const json = await response.json();
       if (response.status == 200) {
         console.log(json);
-        setEmpleados(json);
+        setEmpleados(json.DatosTabla);
+        setCsv(json.DatosCsv);
       } else {
         console.log(json);
         setErrorMessage(json.error);
@@ -98,12 +100,14 @@ export default function GestionEmpleados() {
             Creado en
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
-        )
+        );
       },
     },
     {
       accessorKey: "id",
-      header: ()=>{privilegios == 'gerente' ? 'Ver/Editar' : ''},
+      header: () => {
+        privilegios == "gerente" ? "Ver/Editar" : "";
+      },
       cell: ({ row }) => {
         if (privilegios == "gerente") {
           return (
@@ -116,8 +120,8 @@ export default function GestionEmpleados() {
               Ver/Editar
             </div>
           );
-        }else{
-            return <div></div>
+        } else {
+          return <div></div>;
         }
       },
     },
@@ -126,8 +130,34 @@ export default function GestionEmpleados() {
   return (
     <div className="flex flex-col content-center gap-5 min-h-screen  pt-24">
       <div className="container mx-auto py-10">
-        {errorMessage != null && <div className="flex flex-col gap-4 items-center justify-start">{errorMessage}. {privilegios == 'operador' && <Link className="bg-black rounded p-2 text-white " href="/empleados/nuevo">Registrar empleados</Link>}</div>}
-        {empleados != null && <DataTable columns={columns} data={empleados} headerTitle={'Empleados activos'} headerDesc='Estos son todos los empleados dados de alta.' ctaVisible={true} ctaDesc='Nuevo empleado' ctaLink='/empleados/nuevo' ctaPriv={['operador']} filter_placeholder={'Buscar por RFC'} filter_key={"rfc"}/>}
+        {errorMessage != null && (
+          <div className="flex flex-col gap-4 items-center justify-start">
+            {errorMessage}.{" "}
+            {privilegios == "operador" && (
+              <Link
+                className="bg-black rounded p-2 text-white "
+                href="/empleados/nuevo"
+              >
+                Registrar empleados
+              </Link>
+            )}
+          </div>
+        )}
+        {empleados != null && (
+          <DataTable
+            columns={columns}
+            data={empleados}
+            datosDescarga={csv}
+            headerTitle={"Empleados activos"}
+            headerDesc="Estos son todos los empleados dados de alta."
+            ctaVisible={true}
+            ctaDesc="Nuevo empleado"
+            ctaLink="/empleados/nuevo"
+            ctaPriv={["operador"]}
+            filter_placeholder={"Buscar por RFC"}
+            filter_key={"rfc"}
+          />
+        )}
       </div>
     </div>
   );

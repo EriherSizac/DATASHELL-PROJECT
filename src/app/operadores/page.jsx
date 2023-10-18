@@ -10,6 +10,7 @@ import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 export default function Operadores() {
   const [operadores, setOperadores] = useState(null);
+  const [csv, setCsv] = useState({})
   const [errorMessage, setErrorMessage] = useState(null);
   const { privilegios } = useAuth();
   const router = useRouter();
@@ -29,7 +30,8 @@ export default function Operadores() {
 
       console.log(data);
       if (response.ok) {
-        setOperadores(data);
+        setOperadores(data.DatosTabla);
+        setCsv(data.DatosCsv);
       }
     } catch (error) {
       console.log(error);
@@ -93,6 +95,7 @@ export default function Operadores() {
           <DataTable
             columns={columns}
             data={operadores}
+            datosDescarga={csv}
             headerTitle={"Operadores activos"}
             headerDesc="Estos son todos los operadores dados de alta."
             ctaVisible={true}

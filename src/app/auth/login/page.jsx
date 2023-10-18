@@ -18,7 +18,7 @@ export default function Login() {
     //var token = localStorage.getItem("authToken");
     console.log(authToken);
     if (authToken != null) {
-      var url = "auth/me";
+      var url = NEXT_PUBLIC_backEnd+"auth/me";
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -66,6 +66,7 @@ export default function Login() {
     e.preventDefault();
     if (user != null && user != "" && password != null && password != "") {
       var url = process.env.NEXT_PUBLIC_backEnd + "auth/login";
+      console.log(url)
       const response = await fetch(url, {
         method: "POST",
         headers: {

@@ -12,6 +12,7 @@ import Modal from "@/components/Modal/Modal";
 export default function QuejasYSugerencias() {
   const [errorMessage, setErrorMessage] = useState(null);
   const [tickets, setTickets] = useState(null);
+  const [csv, setCsv] = useState({})
   const router = useRouter();
   const { privilegios } = useAuth();
   const [tipoTickets, setTipoTickets] = useState("todos");
@@ -39,8 +40,8 @@ export default function QuejasYSugerencias() {
     if (response != null) {
       const json = await response.json();
       if (response.status == 200) {
-        console.log(json);
-        setTickets(json);
+        setTickets(json.DatosTabla);
+        setCsv(json.DatosCsv);
       } else {
         if (response.status == 401) {
           setIsOpenMOdal(true);
@@ -280,6 +281,7 @@ export default function QuejasYSugerencias() {
           <DataTable
             columns={columns}
             data={tickets}
+            datosDescarga={csv}
             headerTitle={"Lista de quejas y sugerencias"}
             headerDesc="Estas son las quejas y sugerencias que se han recibido"
             ctaDesc="Dejar queja o sugerencia"

@@ -108,7 +108,7 @@ React.useEffect(() => {
               )}
             </div>
             <div>
-              {ctaPriv.indexOf(privilegios) != -1 && (
+              {privilegios == 'gerente' && datosDescarga != null &&(
                 <>
                 <div
                   className="block bg-black text-white rounded p-3 w-max cursor-pointer"
