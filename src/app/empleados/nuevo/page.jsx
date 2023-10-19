@@ -21,7 +21,6 @@ export default function NuevoEmpleado() {
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-  const [empresa, setEmpresa] = useState(1); // ELIMINAR DESPUES
 
   useEffect(() => {
     privilegios != "operador" && router.push("/");
@@ -84,7 +83,6 @@ export default function NuevoEmpleado() {
         numero_cuenta: numCuenta,
         banco: banco,
         telefono_casa: telefonoCasa,
-        empresa: empresa,
       };
 
       const response = await fetch(url, {
