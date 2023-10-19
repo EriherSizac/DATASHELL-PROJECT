@@ -123,6 +123,7 @@ export default function NuevoEmpleado() {
         banco: banco,
         telefono_casa: telefonoCasa,
         empresa: empresa,
+        id:id
       };
 
       const response = await fetch(url, {
