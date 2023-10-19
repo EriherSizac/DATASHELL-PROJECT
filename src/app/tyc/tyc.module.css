@@ -1,0 +1,211 @@
+
+.test{
+
+}
+.test p {
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: none;
+  font-size: 1rem;
+  margin: 0rem;
+}
+
+.test h1 {
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1.25rem;
+}
+
+.s2 {
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.test li {
+  display: block;
+}
+
+#l1 {
+  padding-left: 0rem;
+  counter-reset: c1 1;
+}
+
+#l1 > li > *:first-child:before {
+  counter-increment: c1;
+  content: counter(c1, upper-latin) ") ";
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+#l1 > li:first-child > *:first-child:before {
+  counter-increment: c1 0;
+}
+
+.test li {
+  display: block;
+}
+
+#l2 {
+  padding-left: 0rem;
+  counter-reset: d1 1;
+}
+
+#l2 > li > *:first-child:before {
+  counter-increment: d1;
+  content: counter(d1, upper-latin) ") ";
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+#l2 > li:first-child > *:first-child:before {
+  counter-increment: d1 0;
+}
+
+#l3 {
+  padding-left: 0rem;
+  counter-reset: d2 1;
+}
+
+#l3 > li > *:first-child:before {
+  counter-increment: d2;
+  content: counter(d2, lower-latin) ") ";
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+#l3 > li:first-child > *:first-child:before {
+  counter-increment: d2 0;
+}
+
+
+
+#l4 {
+  padding-left: 0rem;
+  counter-reset: e1 1;
+}
+
+#l4 > li > *:first-child:before {
+  counter-increment: e1;
+  content: counter(e1, lower-latin) ") ";
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+#l4 > li:first-child > *:first-child:before {
+  counter-increment: e1 0;
+}
+
+
+
+#l5 {
+  padding-left: 0rem;
+  counter-reset: f1 1;
+}
+
+#l5 > li > *:first-child:before {
+  counter-increment: f1;
+  content: counter(f1, lower-latin) ") ";
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+#l5 > li:first-child > *:first-child:before {
+  counter-increment: f1 0;
+}
+
+#l6 {
+  padding-left: 0rem;
+  counter-reset: f2 1;
+}
+
+#l6 > li > *:first-child:before {
+  counter-increment: f2;
+  content: counter(f2, decimal) ") ";
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+#l6 > li:first-child > *:first-child:before {
+  counter-increment: f2 0;
+}
+
+
+
+#l7 {
+  padding-left: 0rem;
+  counter-reset: g1 8;
+}
+
+#l7 > li > *:first-child:before {
+  counter-increment: g1;
+  content: counter(g1, decimal) ". ";
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+#l7 > li:first-child > *:first-child:before {
+  counter-increment: g1 0;
+}
+
+#l8 {
+  padding-left: 0rem;
+  counter-reset: g2 1;
+}
+
+#l8 > li > *:first-child:before {
+  counter-increment: g2;
+  content: counter(g2, lower-latin) ") ";
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+#l8 > li:first-child > *:first-child:before {
+  counter-increment: g2 0;
+}
+
+
+.tbody {
+  vertical-align: top;
+  overflow: visible;
+}

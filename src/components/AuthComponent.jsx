@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
   async function checkAuth() {
     const token = localStorage.getItem("authToken");
     setAuthToken(token);
-    if (token == null && location.pathname != "/quejas-y-sugerencias/nueva") {
+    if (token == null && location.pathname != "/quejas-y-sugerencias/nueva" && location.pathname != "/tyc") {
       if (location.pathname != "/auth/login") {
         router.push("/");
       }
