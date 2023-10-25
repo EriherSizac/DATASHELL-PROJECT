@@ -10,6 +10,7 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import CsvDownloadButton from "react-json-to-csv";
+import Papa from "papaparse";
 import {
   ColumnDef,
   flexRender,
@@ -35,7 +36,7 @@ import { Button } from "@/components/ui/button";
 
 import { useAuth } from "../AuthComponent";
 import Link from "next/link";
-
+const allowedExtensions = ["csv"]; // extensiones permitidas
 export function DataTable({
   columns,
   data,
@@ -47,12 +48,15 @@ export function DataTable({
   ctaVisible,
   filter_placeholder,
   filter_key,
-  datosDescarga
+  datosDescarga, // los datos para descargar como csv
+  showSubirCsv, // si muestra  o no el boton para cargar un csv
+  csvAction, // qué hará despues de cargar el csv
+  subirCsvText, // texto del boton
 }) {
   // and now we will use this useReactTable hook
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
-  const[headers, setHeaders] = React.useState([]);
+  const [headers, setHeaders] = React.useState([]);
   const table = useReactTable({
     data,
     columns,
@@ -67,21 +71,93 @@ export function DataTable({
       columnFilters,
     },
   });
-  const { privilegios } = useAuth();
+  const { privilegios, loadingToast } = useAuth();
 
-  function getRows(){
-    var len = Object.keys(columns) ;
-    var newT = []
+  // Se guardan los datos parseados
+  const [parsedData, setparsedData] = React.useState([]);
+
+  // Se guardan los errores
+  const [error, setError] = React.useState("");
+
+  // Para guardar el file usado por el usuario
+  const [file, setFile] = React.useState("");
+
+  function getRows() {
+    var len = Object.keys(columns);
+    var newT = [];
     for (let i = 0; i < len.length; i++) {
       newT.push(columns[i].accessorKey);
-      
     }
     return newT;
   }
-React.useEffect(() => {
-  setHeaders(getRows());
-}, [])
+  React.useEffect(() => {
+    setHeaders(getRows());
+  }, []);
 
+  // Función para cuando cambia el input file
+  const handleFileChange = (e) => {
+    loadingToast('Leyendo datos', 'subiendocsv', 'pending')
+    setError("");
+    // Verifica que haya un file
+    if (e.target.files.length) {
+      const inputFile = e.target.files[0];
+
+      // Verifica la extensión
+      const fileExtension = inputFile?.type.split("/")[1];
+      if (!allowedExtensions.includes(fileExtension)) {
+        //setError("Por favor sube un archivo csv");
+        loadingToast('Sube un archivo csv', 'subiendocsv', 'error')
+        return;
+      }
+      // Si todo bien, coloca el archvo en el estado
+      setFile(inputFile);
+    }
+  };
+
+  //
+  const handleParse = () => {
+    // If user clicks the parse button without
+    // a file we show a error
+    if (!file) return loadingToast('Sube un archivo csv', 'subiendocsv', 'error')
+
+    // Initialize a reader which allows user
+    // to read any file or blob.
+    const reader = new FileReader();
+
+    // Event listener on reader when the file
+    // loads, we parse it and set the data.
+    reader.onload = async ({ target }) => {
+      const csv = Papa.parse(target.result, {
+        header: true,
+      });
+      const parsedData = csv?.data;
+      console.log(parsedData);
+     /*  const rows = Object.keys(parsedData[0]);
+
+      const columns = Object.values(parsedData[0]);
+      const res = rows.reduce((acc, e, i) => {
+        return [...acc, [[e], columns[i]]];
+      }, []); */
+      console.log(parsedData);
+      setparsedData(parsedData);
+      loadingToast('Datos procesados con exito', 'subiendocsv', 'success');
+      loadingToast('Subiendo datos al servidor', 'subiendocsv2', 'pending');
+    };
+    reader.readAsText(file);
+  };
+
+  React.useEffect(()=>{
+    console.log('parsed', parsedData)
+    if(parsedData.length > 0){
+      csvAction(parsedData, setparsedData, setFile);
+    }
+  }, [parsedData])
+
+  React.useEffect(()=>{
+    if(file != ""){
+      handleParse();
+    }
+  }, [file])
 
   return (
     <div className="">
@@ -104,26 +180,49 @@ React.useEffect(() => {
 
           <div className="flex flex-row gap-4">
             <div>
-              {ctaPriv.indexOf(privilegios) != -1 && ctaVisible && ctaLink != '' && (
-                <Link
-                  href={ctaLink}
-                  className="block bg-black text-white rounded p-3 w-max cursor-pointer"
-                >
-                  {ctaDesc}
-                </Link>
+              {ctaPriv.indexOf(privilegios) != -1 &&
+                ctaVisible &&
+                ctaLink != "" && (
+                  <Link
+                    href={ctaLink}
+                    className="block bg-black text-white rounded p-3 w-max cursor-pointer"
+                  >
+                    {ctaDesc}
+                  </Link>
+                )}
+            </div>
+            <div>
+              {privilegios == "gerente" && datosDescarga != null && (
+                <>
+                  <div
+                    className="block bg-black text-white rounded p-3 w-max cursor-pointer"
+                    onClick={() => {
+                      document.getElementById("here").click();
+                    }}
+                  >
+                    Descargar tabla como CSV
+                  </div>
+                  <CsvDownloadButton
+                    id="here"
+                    className="hidden"
+                    headers={datosDescarga.headers}
+                    data={datosDescarga.data}
+                    filename={headerTitle + ".csv"}
+                    delimiter=","
+                  />
+                </>
               )}
             </div>
             <div>
-              {privilegios == 'gerente' && datosDescarga != null &&(
+              {showSubirCsv && privilegios == 'operador' && (
                 <>
-                <div
-                  className="block bg-black text-white rounded p-3 w-max cursor-pointer"
-                  onClick={()=>{document.getElementById('here').click()}}
-                >
-                  Descargar como CSV
-                  
-                </div>
-                <CsvDownloadButton id="here" className="hidden" headers={datosDescarga.headers} data={datosDescarga.data} filename={headerTitle+'.csv'} delimiter=","/>
+                  <label
+                    htmlFor="csvUp"
+                    className="block bg-black text-white rounded p-3 w-max cursor-pointer "
+                  >
+                    {subirCsvText}{" "}
+                  </label>
+                  <input id="csvUp" type="file" className="hidden" onChange={handleFileChange}/>
                 </>
               )}
             </div>

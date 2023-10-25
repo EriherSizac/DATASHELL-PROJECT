@@ -20,7 +20,7 @@ export default function GestionEmpleados() {
   const [empleados, setEmpleados] = useState(null); // para guardar empleados
   const [csv, setCsv] = useState({}); // para guardar la info para descargar
   const router = useRouter(); // para redirigir
-  const { privilegios } = useAuth(); // obtenemos le nivel de acceso
+  const { privilegios, loadingToast } = useAuth(); // obtenemos le nivel de acceso
 
   // función que obtiene todos los empleados de la base de dats
   async function getEmpleados() {
@@ -51,6 +51,50 @@ export default function GestionEmpleados() {
     }
   }
 
+  async function uploadAll(data, setParsed, setFile) {
+    const subirDatos = async () => {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_backEnd + "operador/subir-empleados-bulk",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify(data),
+        }
+      ).catch((error) => {
+        loadingToast("Ocurrió un error: " + error, "subiendocsv2", "error");
+        setParsed("");
+        setFile("");
+        document.querySelector('#csvUp').value="";
+      });
+
+      if (response) {
+        const rdata = await response.json();
+        if (response.ok) {
+          loadingToast(
+            "Los empleados se subieron con éxito",
+            "subiendocsv2",
+            "success"
+          );
+        } else {
+          loadingToast(
+            "Ocurrió un error: " + rdata.message,
+            "subiendocsv2",
+            "error"
+          );
+        }
+        console.log(data);
+      }
+    };
+    if (data) {
+      subirDatos();
+    }
+  }
+
+  // obtenemos los empleados
   useEffect(() => {
     getEmpleados();
   }, []);
@@ -168,6 +212,9 @@ export default function GestionEmpleados() {
             ctaPriv={["operador"]}
             filter_placeholder={"Buscar por RFC"}
             filter_key={"rfc"}
+            showSubirCsv={true}
+            csvAction={uploadAll}
+            subirCsvText={"Subir empleados con un csv"}
           />
         )}
       </div>

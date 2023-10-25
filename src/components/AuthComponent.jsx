@@ -16,7 +16,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
-
+import { toast, Toaster, ToastBar } from "react-hot-toast";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
@@ -25,6 +25,7 @@ export function AuthProvider({ children }) {
   const [nombreEmpleado, setNombreEmpleado] = useState(null); // para guardar el nombre del empleado
   const [privilegios, setPrivilegios] = useState(null); // para guardar su nivel de acceso
   const router = useRouter(); // para redirigir
+  const [toastId, setToastId] = useState(null); // para guardar el id del toast y no repetir
 
   // función que guarda el token en local storage
   function saveToken(token) {
@@ -37,7 +38,11 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem("authToken"); // obtenemos token
     setAuthToken(token);
     // si el token es nulo y no estamos en una de las locaciones "permitidas", entonces redirigimos
-    if (token == null && location.pathname != "/quejas-y-sugerencias/nueva" && location.pathname != "/tyc") {
+    if (
+      token == null &&
+      location.pathname != "/quejas-y-sugerencias/nueva" &&
+      location.pathname != "/tyc"
+    ) {
       if (location.pathname != "/auth/login") {
         router.push("/");
       }
@@ -93,6 +98,29 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, []);
 
+  // función que genera toasts con acción
+  const loadingToast = (message, id, status = "pending") => {
+    if (status === "pending") {
+      if (id === toastId) return;
+      setToastId(id);
+      toast.loading(message, {
+        id,
+      });
+    }
+
+    if (status === "success") {
+      toast.success(message, {
+        id,
+      });
+      setToastId(null);
+    } else if (status === "error") {
+      toast.error(message, {
+        id,
+      });
+      setToastId(null);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -105,9 +133,19 @@ export function AuthProvider({ children }) {
         saveToken,
         setPrivilegios,
         closeSession,
-        checkAuth
+        checkAuth,
+        loadingToast
       }}
     >
+      <Toaster position="bottom-center">
+        {(t) => (
+          <ToastBar
+            toast={t}
+            //style={{}} // Overwrite styles
+            position="bottom-center" // Used to adapt the animation
+          />
+        )}
+      </Toaster>
       {children}
     </AuthContext.Provider>
   );
