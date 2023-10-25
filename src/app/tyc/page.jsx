@@ -11,9 +11,11 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import "./tyc.module.css";
 import styles from "./tyc.module.css";
+import Link from "next/link";
 export default function TYC() {
   const [user, setuser] = useState(null); // Estado para guardar el identificador de usuario
   const searchParams = useSearchParams(); // Para buscar los query params
+  const [accepted, setaccepted] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -22,11 +24,35 @@ export default function TYC() {
     }
   }, []);
 
-  function aceptarTyc(){
-    console.log('aceptaste')
+  function aceptarTyc() {
+    const acceptTyc = async () => {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_backEnd + "auth/aceptar-tyc",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            id: user,
+          }),
+        }
+      );
+
+      const data = await response.json();
+        if(response.ok){
+          setaccepted(true);
+        }
+      console.log(data);
+    };
+    if (user != null) {
+      acceptTyc();
+    }
   }
 
-  return (
+  return !accepted ? (
     <div className="flex flex-col content-center items-center gap-10 min-h-screen justify-center pt-[7rem] pb-5">
       <div className={` ${styles.test}`}>
         <p
@@ -1038,6 +1064,12 @@ export default function TYC() {
       >
         Acepto los términos y condiciones
       </div>
+    </div>
+  ) : (
+    <div className="flex flex-col content-center items-center gap-10 min-h-screen justify-center pt-[7rem] pb-5 text-center">
+      <h1>Aceptaste nuestros términos y condiciones</h1>
+      <div className="text-xl">Ya puedes hacer uso de nuestro servicio.</div>
+      <Link href="https://api.whatsapp.com/send?phone=5215525392003" target="_blank" className="text-md underline">Regresa a Whatsapp para continuar</Link>
     </div>
   );
 }
