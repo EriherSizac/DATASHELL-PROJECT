@@ -1,3 +1,11 @@
+/**
+ * @author Erick Hernández Silva
+ * @email hernandezsilvaerick@gmail.com
+ * @create date 2023-09-27 10:26:45
+ * @modify date 2023-10-25 10:26:45
+ * @desc Página que renderiza los datos de un empleado para ser modificados.
+ */
+
 "use client";
 
 import { useAuth } from "@/components/AuthComponent";
@@ -8,6 +16,7 @@ import { dialCodes } from "@/components/dialCodes";
 import Modal from "@/components/Modal/Modal";
 
 export default function NuevoEmpleado() {
+  // Definimos todos los estados para guardar la info del empleado
   const [nombreCompleto, setNombreCompleto] = useState("");
   const [rfc, setRfc] = useState("");
   const [correo, setCorreo] = useState("");
@@ -21,12 +30,13 @@ export default function NuevoEmpleado() {
   const [bancos, setBancos] = useState([]);
   const [message, setMessage] = useState("");
   const router = useRouter();
-  const [empresa, setEmpresa] = useState(1); // ELIMINAR DESPUES
+  const [empresa, setEmpresa] = useState(1); // Como solo tenemos una empresa, se hardcodea el ID
   const [id, setId] = useState(null);
   const [currentBanco, setCurrentBanco] = useState("");
   const bancoRef = useRef();
   const params = useParams();
 
+  // Función que obtiene la información de un empleado
   const fetchData = async () => {
     try {
       const url =
@@ -56,15 +66,21 @@ export default function NuevoEmpleado() {
       console.log(error);
     }
   };
+
+  // Cuando el ID cambie, obtendremos los datos
   useEffect(() => {
     id != null && fetchData();
   }, [id]);
 
+
+  // Verificamos los privilegios del usuario y obtenemos el id
   useEffect(() => {
     privilegios != "gerente" && router.push("/");
     id == null && setId(params.id.toString());
   }, []);
 
+
+  // Función que obtiene todos los bancos disponibles y los coloca en el dropdown
   async function getBancos() {
     var url =
       process.env.NEXT_PUBLIC_backEnd + "gerente/obtener-bancos?reverse=false";
@@ -92,13 +108,14 @@ export default function NuevoEmpleado() {
         }, 2500);
       }
     } else {
-      setMessage("Rellena todos los campos");
+      setMessage("Ocurrió un error");
       setTimeout(() => {
         setMessage("");
       }, 2000);
     }
   }
 
+  // Función que carga la nueva información del empleado
   async function actualizarEmpleado(e) {
     e != undefined && e.preventDefault();
     if (
@@ -123,7 +140,7 @@ export default function NuevoEmpleado() {
         banco: banco,
         telefono_casa: telefonoCasa,
         empresa: empresa,
-        id:id
+        id: id,
       };
 
       const response = await fetch(url, {
@@ -160,10 +177,12 @@ export default function NuevoEmpleado() {
     }
   }
 
+  // Función que actualiza el estado del nombre
   function handleNombre(e) {
     setNombreCompleto(e.target.value);
   }
 
+  // Función que actualiza el estado del rfc y hace una comprobación de longitud
   function handleRfc(e) {
     var newRFc = e.target.value;
     if (newRFc.length < 14) {
@@ -174,10 +193,12 @@ export default function NuevoEmpleado() {
     }
   }
 
+  // función que actualzia el estado del correo
   function handleCorreo(e) {
     setCorreo(e.target.value);
   }
 
+  // Función que actualiza el estado del celular y lo comprueba usando regex
   function handleCelular(e) {
     var re = /^[0-9]{0,10}$/;
     if (re.test(e.target.value) || e.target.value == "") {
@@ -186,7 +207,7 @@ export default function NuevoEmpleado() {
       e.target.value = celular;
     }
   }
-
+  // Función que actualiza el estado del telefono de casa y lo comprueba usando regex
   function handleTelCasa(e) {
     setTelefonoCasa(e.target.value);
     var re = /^[0-9]{0,12}$/;
@@ -197,21 +218,27 @@ export default function NuevoEmpleado() {
     }
   }
 
+  // Función que actualiza el estado del numero de cuenta
   function handleNumCuenta(e) {
     setNumCuenta(e.target.value);
   }
 
+  // Funcion que actualiza el estado del banco del empleado
   function handleBanco(e) {
     setBanco(e.target.value);
   }
 
+  // Función que actualiza la dirección del empleado
   function handleDireccion(e) {
     setDireccion(e.target.value);
   }
+
+  // Funciópn que actualiza el estado del código de país del empleado  
   function handleCountryCode(e) {
     setCountrCode(e.target.value);
   }
 
+  // Función que limpia los campos del formulario
   function limpiarCampos(e) {
     e != undefined && e.preventDefault();
     setDireccion("");
@@ -229,14 +256,16 @@ export default function NuevoEmpleado() {
   }
 
   useEffect(() => {
+    // Cuandos e cargue la página, obtenemos todos los bancos
     getBancos();
   }, []);
 
   useEffect(() => {
+    // Iteramos sobre los bancos para obtener el actual en caso de actualizar un empleado
     bancos.map((banco_item, key) => {
       if (banco_item.nombre == currentBanco) {
         bancoRef.current.selectedIndex = key;
-        setBanco(banco_item.id)
+        setBanco(banco_item.id);
       }
     });
   }, [currentBanco, bancos]);

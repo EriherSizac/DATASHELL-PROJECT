@@ -1,30 +1,33 @@
-"use client";
+/**
+ * @author Erick Hernández Silva
+ * @email hernandezsilvaerick@gmail.com
+ * @create date 2023-09-28 10:34:45
+ * @modify date 2023-10-25 10:34:45
+ * @desc Página que muestra una tabla de quejas y sugerencias que se han recibido
+ */
 "use client";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/Table/dataTable";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/AuthComponent";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import Modal from "@/components/Modal/Modal";
 
 export default function QuejasYSugerencias() {
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [tickets, setTickets] = useState(null);
-  const [csv, setCsv] = useState({})
-  const router = useRouter();
-  const { privilegios } = useAuth();
-  const [tipoTickets, setTipoTickets] = useState("todos");
-  const [tipoUsuarios, setTipoUsuarios] = useState("todos");
-  const tipos_usuario = ["empleado", "operador", "gerente"];
-  const [isOpenModal, setIsOpenMOdal] = useState(false);
-  const tipos_ticket = ["queja", "sugerencia", "otro"];
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [modalHeader, setModalHeader] = useState("");
-  const refRoles = useRef();
-  const refAsuntos = useRef();
+  const [errorMessage, setErrorMessage] = useState(null); // para mostrar errores
+  const [tickets, setTickets] = useState(null); // para guardar los tickets
+  const [csv, setCsv] = useState({}) // para guardar la info descargable
+  const [tipoTickets, setTipoTickets] = useState("todos"); //filtro
+  const [tipoUsuarios, setTipoUsuarios] = useState("todos"); // filtro
+  const tipos_usuario = ["empleado", "operador", "gerente"];// datos dropdown filtro
+  const [isOpenModal, setIsOpenMOdal] = useState(false); // estado del modal de informacion
+  const tipos_ticket = ["queja", "sugerencia", "otro"]; // datos dropdown filtro
+  const [selectedIndex, setSelectedIndex] = useState(-1); // index ticket seleccionado
+  const [modalHeader, setModalHeader] = useState(""); // titulo del modal
+  const refRoles = useRef(); // ref del dropdown
+  const refAsuntos = useRef(); // ref del dropdown
 
+  // función que obtiene todas las quejas
   async function getQuejas() {
     var url =
       process.env.NEXT_PUBLIC_backEnd +
@@ -53,6 +56,7 @@ export default function QuejasYSugerencias() {
     }
   }
 
+  // función que limpia los filtros
   function limpiarFiltros(e) {
     e.preventDefault();
     setTipoTickets("todos");
@@ -61,6 +65,7 @@ export default function QuejasYSugerencias() {
     refAsuntos.current.selectedIndex = 0;
   }
 
+  // función que abre el modal con los detalles del ticket
   function verDetalle(index) {
     if (index == -1) {
       return <div></div>;

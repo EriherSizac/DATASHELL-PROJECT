@@ -1,3 +1,12 @@
+/**
+ * @author Erick Hernández Silva
+ * @email hernandezsilvaerick@gmail.com
+ * @create date 2023-09-27 10:26:45
+ * @modify date 2023-10-25 10:26:45
+ * @desc Página que muestra todos los operadores activos
+ */
+
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,12 +18,13 @@ import { useAuth } from "@/components/AuthComponent";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 export default function Operadores() {
-  const [operadores, setOperadores] = useState(null);
-  const [csv, setCsv] = useState({})
-  const [errorMessage, setErrorMessage] = useState(null);
-  const { privilegios } = useAuth();
+  const [operadores, setOperadores] = useState(null); // para guardar la lista de operadores
+  const [csv, setCsv] = useState({}) // para guardar la info del csv a descargar
+  const [errorMessage, setErrorMessage] = useState(null); // para mostrar errores
+  const { privilegios } = useAuth(); // para saber los privilegios del usuario
   const router = useRouter();
 
+  // función para obtener todos los operadores de la BD
   const fetchData = async () => {
     try {
       const url =
@@ -37,12 +47,14 @@ export default function Operadores() {
       console.log(error);
     }
   };
+
+
   useEffect(() => {
-    fetchData();
+    fetchData(); // obtenemos los datos al cargar la pag.
   }, []);
 
+  // Definimos las columnas que estarán en la tabla
   const columns = [
-    //we can set normal fields like this
     {
       accessorKey: "nombre",
       header: "Nombre",

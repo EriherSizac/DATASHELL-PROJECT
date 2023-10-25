@@ -1,5 +1,12 @@
-"use client";
+/**
+ * @author Erick Hernández Silva
+ * @email hernandezsilvaerick@gmail.com
+ * @create date 2023-09-27 10:26:45
+ * @modify date 2023-10-25 10:26:45
+ * @desc Página que permite registrar un nuevo operador
+ */
 
+"use client";
 import { useAuth } from "@/components/AuthComponent";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -9,19 +16,22 @@ import Modal from "@/components/Modal/Modal";
 import toast, { Toaster, ToastBar } from "react-hot-toast";
 
 export default function NuevoOperador() {
-  const [nombreCompleto, setNombreCompleto] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const { privilegios } = useAuth();
-  const router = useRouter();
+  const [nombreCompleto, setNombreCompleto] = useState(""); // estado para el nombre
+  const [username, setUsername] = useState(""); // estado para el nombre de usuario para acceso
+  const [password, setPassword] = useState(""); // estado para la contraseña
+  const [message, setMessage] = useState(""); // estado para desplegar mensajes
+  const { privilegios } = useAuth(); // obtenemos privilegios del usuario
+  const router = useRouter(); // para redirigir
 
+  // verificamos privilegios
   useEffect(() => {
     privilegios != "gerente" && router.push("/");
   }, []);
 
+  // función que crea un operador enviando los datos a la api
   async function crearOperador(e) {
     e != undefined && e.preventDefault();
+    // verificamos que todos los campos estén llenos
     if ((nombreCompleto != "") & (username != "") & (password != "")) {
       var url = process.env.NEXT_PUBLIC_backEnd + "gerente/create-operador";
       var authToken = localStorage.getItem("authToken");
@@ -44,12 +54,14 @@ export default function NuevoOperador() {
       });
       if (response != null) {
         if (response.status == 200) {
+          // si todo bien, limpiamos campos y desplegamos mensaje
           console.log(response.body);
           toast(`Operador ${nombreCompleto} creado con éxito`);
           setTimeout(() => {
             limpiarCampos();
           }, 1000);
         } else {
+          // si no, mostramos el error.
           const json = await response.json();
           console.log(json);
           setMessage(json.error);
@@ -66,18 +78,22 @@ export default function NuevoOperador() {
     }
   }
 
+  // función para actualziar nombre
   function handleNombre(e) {
     setNombreCompleto(e.target.value);
   }
 
+  // función poara actualizar nombre de usuario
   function handleUsername(e) {
     setUsername(e.target.value);
   }
 
+  // función para actualziar contraseña
   function handlePassword(e) {
     setPassword(e.target.value);
   }
 
+  // función para limpiar campos
   function limpiarCampos(e) {
     e != undefined && e.preventDefault();
     setUsername("");

@@ -1,5 +1,12 @@
-"use client";
+/**
+ * @author Erick Hernández Silva
+ * @email hernandezsilvaerick@gmail.com
+ * @create date 2023-09-27 10:26:45
+ * @modify date 2023-10-25 10:26:45
+ * @desc Página que permite actualizar o eliminar un operador
+ */
 
+"use client";
 import { useAuth } from "@/components/AuthComponent";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -8,19 +15,20 @@ import Modal from "@/components/Modal/Modal";
 import toast, { Toaster, ToastBar } from "react-hot-toast";
 
 export default function EditarOperador() {
-  const [nombreCompleto, setNombreCompleto] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [eliminarMensaje, setEliminarMensaje] = useState("Eliminar acceso");
-  const [timer, setTimer] = useState(5);
-  const [id, setId] = useState();
-  const [interval, setInter] = useState(null);
+  const [nombreCompleto, setNombreCompleto] = useState(""); // guardar nombre
+  const [username, setUsername] = useState(""); // estado para guardar usuario
+  const [password, setPassword] = useState(""); // estado para guardar contraseña
+  const [message, setMessage] = useState(""); // estado para mostrar mensajes
+  const [eliminarMensaje, setEliminarMensaje] = useState("Eliminar acceso"); // estado para el botón de eliminar
+  const [timer, setTimer] = useState(5); //tiempo inicial del contador
+  const [id, setId] = useState(); // guarda el id del operador a modificar
+  const [interval, setInter] = useState(null); // estado para concoer el tiempo del countdown de eliminacion
 
-  const { privilegios } = useAuth();
-  const router = useRouter();
-  const params = useParams();
+  const { privilegios } = useAuth(); // obtenemos privilegios
+  const router = useRouter(); // para redirigir
+  const params = useParams(); // sacamos los query params
 
+  // sacamos la info del operador
   const fetchData = async () => {
     try {
       const url =
@@ -33,27 +41,38 @@ export default function EditarOperador() {
       });
 
       const data = await response.json();
-
       if (response.ok) {
+        // si todo bien desplegamos la info
         console.log(data);
         setNombreCompleto(data.nombre);
         setUsername(data.username);
+      }else{
+        // sino, mostramos mensaje y vamos para atrás.
+        toast('Este operador no existe. Redirigiendo...');
+        router.back();
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+
   useEffect(() => {
+    // obtenemos los datos si aún no se ha hecho
     id != null && fetchData();
   }, [id]);
 
   useEffect(() => {
+    // verificamos privilegios
     privilegios != "gerente" && router.push("/");
+    // sacamos datos de los aprams
     id == null && setId(params.id.toString());
   }, []);
 
+  // función que actualiza los datos de un opreador
   async function actualizarOperador(e) {
     e != undefined && e.preventDefault();
+    // se verifica que se rellene al menos el nombre y el usuario
     if ((nombreCompleto != "") & (username != "")) {
       var url = process.env.NEXT_PUBLIC_backEnd + "gerente/editar-operador";
       console.log(url);
@@ -89,10 +108,11 @@ export default function EditarOperador() {
         }
       }
     } else {
-      toast("Rellena todos los campos");
+      toast("Rellena al menos nombre y usuario");
     }
   }
 
+  // función que elimina un operador
   async function eliminarOperador(e) {
     e != undefined && e.preventDefault();
     if ((nombreCompleto != "") & (username != "")) {
@@ -134,18 +154,22 @@ export default function EditarOperador() {
     }
   }
 
+  // Funcion para manejar el nombnre
   function handleNombre(e) {
     setNombreCompleto(e.target.value);
   }
 
+  // Funcion para manejar el username
   function handleUsername(e) {
     setUsername(e.target.value);
   }
 
+  // Funcion para manejar el password
   function handlePassword(e) {
     setPassword(e.target.value);
   }
 
+  // función para limpiar los campos
   function limpiarCampos(e) {
     e != undefined && e.preventDefault();
     setUsername("");
@@ -153,6 +177,7 @@ export default function EditarOperador() {
     setNombreCompleto("");
   }
 
+  // Función que inicia un contador hacia abajo de 5 segundos y modifica el texto del botón
   function startTimer(duration) {
     let timer = duration;
     setEliminarMensaje(
@@ -173,12 +198,15 @@ export default function EditarOperador() {
     setInter(intervalId); // Save the interval ID to state
   }
 
+  // Función que verifica el estado del botón e inicia un contador para eliminar el operador
   function eliminarOperadorPre(e) {
     e.preventDefault();
     if (eliminarMensaje == "Eliminar acceso") {
+      // si es el estado iniciar, se inicia un contador de 5 segundos
       startTimer(5);
       return;
     } else {
+      //Si se vuelve a presionar en los proximos 5 segundos se elimina el operador
       eliminarOperador();
     }
   }

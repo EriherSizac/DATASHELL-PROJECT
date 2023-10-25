@@ -1,10 +1,15 @@
-"use client";
+/**
+ * @author Erick Hernández Silva
+ * @email hernandezsilvaerick@gmail.com
+ * @create date 2023-09-28 10:34:45
+ * @modify date 2023-10-25 10:34:45
+ * @desc Página que muestra una lista de solicitudes que se han recibido
+ */
 "use client";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/Table/dataTable";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthComponent";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import Modal from "@/components/Modal/Modal";
@@ -13,21 +18,20 @@ const notifyCancel = () => toast("Cancelación exitosa");
 const notifyPayment = () => toast("Pago exitoso");
 
 export default function Solicitudes() {
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [adelantos, setAdelantos] = useState([]);
-  const [monto, setMonto] = useState("todos");
-  const [estatus, setEstatus] = useState("todos");
-  const [isOpenModal, setIsOpenMOdal] = useState(false);
-  const router = useRouter();
-  const { privilegios } = useAuth();
-  const montos_dropdown = ["500", "1000"];
-  const estatus_dropdown = ["creado", "pagado", "cancelado"];
-  const [empleadoDetalles, setEmpleadoDetalles] = useState(-1);
-  const [empleadoNombre, setEmpleadoNombre] = useState("");
-  const [empleadoInfo, setEmpleadoInfo] = useState(null);
-  const [accionEmpleado, setAccionEmpleado] = useState(-1);
-  const [DatosCsv, setDatosCsv] = useState({})
+  const [errorMessage, setErrorMessage] = useState(null); // para mostrar errores
+  const [adelantos, setAdelantos] = useState([]); // para guardar la lista de solicitudes
+  const [monto, setMonto] = useState("todos"); // para los filtros por monto
+  const [estatus, setEstatus] = useState("todos"); // para los filtros por estatus
+  const [isOpenModal, setIsOpenMOdal] = useState(false); // para controlar el modal
+  const { privilegios } = useAuth(); // para verificar privilegios
+  const montos_dropdown = ["500", "1000"]; // para el filtro de mopntos
+  const estatus_dropdown = ["creado", "pagado", "cancelado"]; // para el filtro de estatus
+  const [empleadoDetalles, setEmpleadoDetalles] = useState(-1); // para guardar la solicitud
+  const [modalHeader, setmodalHeader] = useState(""); // para guardar el header del modal
+  const [accionEmpleado, setAccionEmpleado] = useState(-1); // para guardar el index de la solicitud actual
+  const [DatosCsv, setDatosCsv] = useState({}); // para guardar los datos a descargar
 
+  // función que obtiene todas las solicitudes
   async function getSolicitudes() {
     var url =
       process.env.NEXT_PUBLIC_backEnd +
@@ -57,35 +61,7 @@ export default function Solicitudes() {
     }
   }
 
-  async function getEmpleadoDetalles() {
-    var url =
-      process.env.NEXT_PUBLIC_backEnd +
-      `operador/detalles-empleado?id=${empleadoDetalles}`;
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).catch((error) => {
-      console.log(error);
-    });
-    if (response != null) {
-      const json = await response.json();
-      if (response.status == 200) {
-        console.log(json);
-        setEmpleadoInfo(json);
-        setEmpleadoNombre(json.nombre);
-      } else {
-        if (response.status == 401) {
-          setEmpleadoInfo(null);
-        }
-        console.log(json);
-        //setErrorMessage(json.error);
-        setEmpleadoInfo(null);
-      }
-    }
-  }
-
+  // función para cancelar una solicitud
   async function cancelarSolicitud(id) {
     var url = process.env.NEXT_PUBLIC_backEnd + `operador/cancelar-adelanto`;
     const response = await fetch(url, {
@@ -108,15 +84,16 @@ export default function Solicitudes() {
         getSolicitudes();
       } else {
         if (response.status == 401) {
-          setEmpleadoInfo(null);
+          setAccionEmpleado(-1);
         }
         console.log(json);
         //setErrorMessage(json.error);
-        setEmpleadoInfo(null);
+        setAccionEmpleado(-1);
       }
     }
   }
 
+  // función para pagar una solicitud
   async function pagarSolicitud(id) {
     var url = process.env.NEXT_PUBLIC_backEnd + `gerente/pagar-adelanto`;
     const response = await fetch(url, {
@@ -139,11 +116,11 @@ export default function Solicitudes() {
         getSolicitudes();
       } else {
         if (response.status == 401) {
-          setEmpleadoInfo(null);
+          setEmpleadoDetalles(-1);
         }
         console.log(json);
         //setErrorMessage(json.error);
-        setEmpleadoInfo(null);
+        setEmpleadoDetalles(-1);
       }
     }
   }
@@ -158,55 +135,9 @@ export default function Solicitudes() {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
-  function verEmpleado() {
-    console.log("EMPLEADO");
-    if (empleadoInfo != null && empleadoDetalles != -1) {
-      console.log(empleadoInfo.nombre);
-      return (
-        <div className="w-full flex items-center align-center justify-center p-4">
-          <div className="w-full flex flex-col items-center align-center justify-center gap-2">
-            <div className="w-full flex flex-col items-left align-center justify-left gap-2">
-              <div>
-                <div className="font-bold">Registrado en:</div>{" "}
-                {empleadoInfo.creado_en}
-              </div>
-              <Link href={`mailto:${empleadoInfo.correo}`} target="_blank">
-                <div className="font-bold">Correo:</div> {empleadoInfo.correo}
-              </Link>
-              <Link
-                href={`https://api.whatsapp.com/send?phone=${empleadoInfo.celular}`}
-                target="_blank"
-              >
-                <div className="font-bold">Celular:</div> {empleadoInfo.celular}
-              </Link>
-              <Link href={`tel:${empleadoInfo.celular}`} target="_blank">
-                <div className="font-bold">Teléfono de casa:</div>{" "}
-                {empleadoInfo.telefono_casa}
-              </Link>
-              <div className="font-bold">Dirección:</div>{" "}
-              {empleadoInfo.direccion}
-              <div className="font-bold">RFC:</div> {empleadoInfo.rfc}
-              <div className="flex flex-row gap-4 w-full">
-                <div className="flex flex-row gap-4 w-full">
-                  <div className="font-bold">Banco:</div>{" "}
-                  <div className="">{empleadoInfo.banco}</div>
-                </div>
-                <div className="flex flex-row gap-4 w-full">
-                  <div className="font-bold">N° de cuenta:</div>{" "}
-                  <div>{empleadoInfo.numero_cuenta}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-  }
-
+  // función que devuelve el contenido del modal yu depdendiendo de los privilegios del usuari muestra el boton de cancelar o pagar adelanto
   function accionEnEmpleado() {
     if (accionEmpleado != -1) {
-      console.log("ACCION EN EMPLEADO");
-      console.log(adelantos[accionEmpleado].nombre);
       var adelanto = adelantos[accionEmpleado];
       return (
         <div className="w-full flex items-center align-center justify-center p-4">
@@ -258,29 +189,20 @@ export default function Solicitudes() {
     getSolicitudes();
   }, [monto, estatus]);
 
-  // obtener info de un empleado cuando cambie la variable empleado detalles
+  // para abrir el modal si el id del empleado es diferente de -1
   useEffect(() => {
-    if (empleadoDetalles != -1) {
-      getEmpleadoDetalles();
-    } else {
-    }
-  }, [empleadoDetalles]);
-
-  // para abrir el modal si empleado detalles es diferente de -1 o empleadoAccion
-  useEffect(() => {
-    if (empleadoDetalles != -1 || accionEmpleado != -1) {
-      console.log(accionEmpleado, "here");
-      if (accionEmpleado != -1) {
-        setEmpleadoNombre(`Folio #${adelantos[accionEmpleado].id_adelanto}`);
-      }
+    if (accionEmpleado != -1) {
+      // si es un usuario, entonces colocamos el index de la lista de adelantos
+      setmodalHeader(`Folio #${adelantos[accionEmpleado].id_adelanto}`);
+      // si es un usuario, entonces abrimos modal
       setIsOpenMOdal(true);
     } else {
       setIsOpenMOdal(false);
     }
-  }, [empleadoInfo, accionEmpleado]);
+  }, [accionEmpleado]);
 
   const columns = [
-    //we can set normal fields like this
+    // configuramos las columnas de la tabla
     {
       accessorKey: "id_adelanto",
       header: "Folio",
@@ -320,6 +242,7 @@ export default function Solicitudes() {
       header: "Estatus",
       cell: (row) => {
         var estatus = row.getValue("estatus_adelanto");
+        // retornamos los distintos iconos dependiendo del estado
         return estatus == "pagado" ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -376,6 +299,7 @@ export default function Solicitudes() {
     },
     {
       accessorKey: "fecha",
+      // configuramos el filtro por fecha
       header: ({ column }) => {
         return (
           <Button
@@ -390,19 +314,22 @@ export default function Solicitudes() {
     },
     {
       accessorKey: "id_empleado",
-      header: 'Acción',
+      header: "Acción",
+      // configuramos las acciones dependiendo del estado
       cell: ({ row }) => {
         return (
-          row.getValue('estatus_adelanto') === 'creado' && <div
-          className="p-2 cursor-pointer hover:font-semibold hover:italic"
-          onClick={() => {
-            setAccionEmpleado(row.index);
-          }}
-        >
-          {privilegios == "operador"
-            ? "Cancelar pago"
-            : privilegios == "gerente" && "Pagar"}
-        </div>
+          row.getValue("estatus_adelanto") === "creado" && (
+            <div
+              className="p-2 cursor-pointer hover:font-semibold hover:italic"
+              onClick={() => {
+                setAccionEmpleado(row.index);
+              }}
+            >
+              {privilegios == "operador"
+                ? "Cancelar pago"
+                : privilegios == "gerente" && "Pagar"}
+            </div>
+          )
         );
       },
     },
@@ -420,11 +347,9 @@ export default function Solicitudes() {
             setAccionEmpleado(-1);
           }}
           buttonCloseText="Cerrar"
-          modalHeader={empleadoNombre}
+          modalHeader={modalHeader}
         >
-          {empleadoDetalles > 1
-            ? verEmpleado()
-            : accionEmpleado > -1 && accionEnEmpleado()}
+          {accionEmpleado > -1 && accionEnEmpleado()}
         </Modal>
         <div>
           <div>Filtros adicionales</div>
@@ -472,7 +397,7 @@ export default function Solicitudes() {
             ctaVisible={true}
             datosDescarga={DatosCsv}
             ctaLink=""
-            ctaPriv={['gerente', 'operador']}
+            ctaPriv={["gerente", "operador"]}
             filter_placeholder={"Buscar por RFC"}
             filter_key={"rfc"}
           />

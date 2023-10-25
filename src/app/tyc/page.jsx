@@ -57,6 +57,9 @@ export default function TYC() {
     }
   }
 
+  /*
+    Regresamos los TyC si no se han aceptado, y regresamos la pantalla si ya están aceptados.
+  */
   return !accepted ? (
     <div className="flex flex-col content-center items-center gap-10 min-h-screen justify-center pt-[7rem] pb-5">
       <Toaster position="bottom-center">

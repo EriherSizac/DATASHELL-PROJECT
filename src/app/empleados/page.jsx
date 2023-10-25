@@ -1,3 +1,11 @@
+/**
+ * @author Erick Hernández Silva
+ * @email hernandezsilvaerick@gmail.com
+ * @create date 2023-09-27 10:26:45
+ * @modify date 2023-10-25 10:26:45
+ * @desc Página que despliega una tabla para ver a todos los empleados registrados
+ */
+
 "use client";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/Table/dataTable";
@@ -8,12 +16,13 @@ import { useAuth } from "@/components/AuthComponent";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 export default function GestionEmpleados() {
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [empleados, setEmpleados] = useState(null);
-  const [csv, setCsv] = useState({});
-  const router = useRouter();
-  const { privilegios } = useAuth();
+  const [errorMessage, setErrorMessage] = useState(null); // para mostrar errores
+  const [empleados, setEmpleados] = useState(null); // para guardar empleados
+  const [csv, setCsv] = useState({}); // para guardar la info para descargar
+  const router = useRouter(); // para redirigir
+  const { privilegios } = useAuth(); // obtenemos le nivel de acceso
 
+  // función que obtiene todos los empleados de la base de dats
   async function getEmpleados() {
     var url =
       process.env.NEXT_PUBLIC_backEnd +
@@ -29,11 +38,14 @@ export default function GestionEmpleados() {
     if (response != null) {
       const json = await response.json();
       if (response.status == 200) {
-        console.log(json);
+        // Si todo bien, colocamos los datos en las varibles
         setEmpleados(json.DatosTabla);
         setCsv(json.DatosCsv);
       } else {
-        console.log(json);
+        // Si hay algun problema inicializamos vacío para no perder la tabla
+        setEmpleados([]);
+        setCsv([]);
+        // Y colocamos mensaje de error para que se muestre en pantalla
         setErrorMessage(json.error);
       }
     }

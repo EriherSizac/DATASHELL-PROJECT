@@ -1,5 +1,12 @@
+/**
+ * @author Erick Hernández Silva
+ * @email hernandezsilvaerick@gmail.com
+ * @create date 2023-10-25 10:33:47
+ * @modify date 2023-10-25 10:33:47
+ * @desc Componente que renderiza una tabla de información utilizando tanstack-ui
+ */
+
 "use client";
-//we have to import a lot of things and here are they
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import CsvDownloadButton from "react-json-to-csv";
@@ -59,7 +66,6 @@ export function DataTable({
       sorting,
       columnFilters,
     },
-    // and yes adding pagination can be done with just this above one line
   });
   const { privilegios } = useAuth();
 

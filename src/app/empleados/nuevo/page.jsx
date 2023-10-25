@@ -1,5 +1,12 @@
-"use client";
+/**
+ * @author Erick Hernández Silva
+ * @email hernandezsilvaerick@gmail.com
+ * @create date 2023-09-26 10:26:13
+ * @modify date 2023-10-25 10:46:13
+ * @desc Página que permite registrar empleados
+ */
 
+"use client";
 import { useAuth } from "@/components/AuthComponent";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -7,6 +14,7 @@ import { dialCodes } from "@/components/dialCodes";
 import Modal from "@/components/Modal/Modal";
 
 export default function NuevoEmpleado() {
+  // Definimos todos los estados para guardar la info del empleado
   const [nombreCompleto, setNombreCompleto] = useState("");
   const [rfc, setRfc] = useState("");
   const [correo, setCorreo] = useState("");
@@ -21,11 +29,12 @@ export default function NuevoEmpleado() {
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-
+  // Verificamos los privilegios del usuario
   useEffect(() => {
     privilegios != "operador" && router.push("/");
   }, []);
 
+  // Función que obtiene todos los bancos disponibles y los coloca en el dropdown
   async function getBancos() {
     var url =
       process.env.NEXT_PUBLIC_backEnd + "gerente/obtener-bancos?reverse=false";
@@ -60,6 +69,7 @@ export default function NuevoEmpleado() {
     }
   }
 
+  // Función que verifica el llenado de todos los campos y manda el request al backend
   async function registrarEmpleado(e) {
     e != undefined && e.preventDefault();
     if (
@@ -119,10 +129,12 @@ export default function NuevoEmpleado() {
     }
   }
 
+  // Función que actualiza el estado del nombre
   function handleNombre(e) {
     setNombreCompleto(e.target.value);
   }
 
+  // Función que actualiza el estado del rfc y hace una comprobación de longitud
   function handleRfc(e) {
     var newRFc = e.target.value;
     if (newRFc.length < 14) {
@@ -133,10 +145,12 @@ export default function NuevoEmpleado() {
     }
   }
 
+  // función que actualzia el estado del correo
   function handleCorreo(e) {
     setCorreo(e.target.value);
   }
 
+  // Función que actualiza el estado del celular y lo comprueba usando regex
   function handleCelular(e) {
     var re = /^[0-9]{0,10}$/;
     if (re.test(e.target.value) || e.target.value == "") {
@@ -145,7 +159,7 @@ export default function NuevoEmpleado() {
       e.target.value = celular;
     }
   }
-
+  // Función que actualiza el estado del telefono de casa y lo comprueba usando regex
   function handleTelCasa(e) {
     setTelefonoCasa(e.target.value);
     var re = /^[0-9]{0,12}$/;
@@ -156,21 +170,27 @@ export default function NuevoEmpleado() {
     }
   }
 
+  // Función que actualiza el estado del numero de cuenta
   function handleNumCuenta(e) {
     setNumCuenta(e.target.value);
   }
 
+  // Funcion que actualiza el estado del banco del empleado
   function handleBanco(e) {
     setBanco(e.target.value);
   }
 
+  // Función que actualiza la dirección del empleado
   function handleDireccion(e) {
     setDireccion(e.target.value);
   }
+
+  // Funciópn que actualiza el estado del código de país del empleado
   function handleCountryCode(e) {
     setCountrCode(e.target.value);
   }
 
+  // Función que limpia los campos del formulario
   function limpiarCampos(e) {
     e != undefined && e.preventDefault();
     setDireccion("");
@@ -188,6 +208,7 @@ export default function NuevoEmpleado() {
   }
 
   useEffect(() => {
+     // Cuandos e cargue la página, obtenemos todos los bancos
     getBancos();
   }, []);
 
@@ -309,8 +330,7 @@ export default function NuevoEmpleado() {
         }}
         buttonCloseText={`Volver al formulario`}
         modalHeader={message}
-      >
-      </Modal>
+      ></Modal>
     </div>
   );
 }

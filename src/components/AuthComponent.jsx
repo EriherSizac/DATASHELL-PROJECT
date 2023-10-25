@@ -1,3 +1,11 @@
+/**
+ * @author Erick Hernández Silva
+ * @email hernandezsilvaerick@gmail.com
+ * @create date 2023-09-26 10:42:29
+ * @modify date 2023-10-25 10:45:29
+ * @desc Componente para manejar la autenticación del usuario.
+ */
+
 "use client";
 import { useRouter } from "next/navigation";
 
@@ -12,25 +20,29 @@ import React, {
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [authToken, setAuthToken] = useState(null);
-  const [empresa, setEmpresa] = useState(null);
-  const [nombreEmpleado, setNombreEmpleado] = useState(null);
-  const [privilegios, setPrivilegios] = useState(null);
-  const router = useRouter();
+  const [authToken, setAuthToken] = useState(null); // para guardar el token de acceso
+  const [empresa, setEmpresa] = useState(null); // para guardar la empresa a la que pertence
+  const [nombreEmpleado, setNombreEmpleado] = useState(null); // para guardar el nombre del empleado
+  const [privilegios, setPrivilegios] = useState(null); // para guardar su nivel de acceso
+  const router = useRouter(); // para redirigir
 
+  // función que guarda el token en local storage
   function saveToken(token) {
     localStorage.setItem("authToken", token);
     setAuthToken(token);
   }
 
+  // función que valida la sesión del usuario
   async function checkAuth() {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("authToken"); // obtenemos token
     setAuthToken(token);
+    // si el token es nulo y no estamos en una de las locaciones "permitidas", entonces redirigimos
     if (token == null && location.pathname != "/quejas-y-sugerencias/nueva" && location.pathname != "/tyc") {
       if (location.pathname != "/auth/login") {
         router.push("/");
       }
     }
+    // si el token no es nulo, validamos la sesión
     if (token != null) {
       const url = process.env.NEXT_PUBLIC_backEnd + "auth/validate-session";
       // fetch POST methon with the url passing the token and the new status
@@ -66,7 +78,7 @@ export function AuthProvider({ children }) {
     }
   }
 
-
+  // función que cierra la sesión del usuario
   async function closeSession() {
     localStorage.removeItem("authToken");
     setAuthToken(null);

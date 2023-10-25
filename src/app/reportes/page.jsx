@@ -1,31 +1,34 @@
-"use client";
+/**
+ * @author Erick Hernández Silva
+ * @email hernandezsilvaerick@gmail.com
+ * @create date 2023-10-25 10:33:26
+ * @modify date 2023-10-25 10:33:26
+ * @desc Página de reportes
+ */
+
 "use client";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/Table/dataTable";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/AuthComponent";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import Modal from "@/components/Modal/Modal";
 import { data } from "autoprefixer";
 
 export default function Reportes() {
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [datos, setDatos] = useState(null);
-  const router = useRouter();
-  const { privilegios } = useAuth();
-  const [tipoTickets, setTipoTickets] = useState("todos");
-  const [tipoUsuarios, setTipoUsuarios] = useState("todos");
-  const tipos_usuario = ["empleado", "operador", "gerente"];
-  const [isOpenModal, setIsOpenMOdal] = useState(false);
-  const tipos_ticket = ["queja", "sugerencia", "otro"];
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [modalHeader, setModalHeader] = useState("");
-  const refRoles = useRef();
-  const refAsuntos = useRef();
+  const [errorMessage, setErrorMessage] = useState(null); // para mostrar errores
+  const [datos, setDatos] = useState(null); // para guardar los datos
+  const [tipoTickets, setTipoTickets] = useState("todos"); // para los filtros
+  const [tipoUsuarios, setTipoUsuarios] = useState("todos"); // para los filtros
+  const tipos_usuario = ["empleado", "operador", "gerente"]; // para el dropdown
+  const [isOpenModal, setIsOpenMOdal] = useState(false);//para el modal
+  const tipos_ticket = ["queja", "sugerencia", "otro"];//para el dropdown
+  const [selectedIndex, setSelectedIndex] = useState(-1); // para saber cual está seleccionado
+  const [modalHeader, setModalHeader] = useState("");//para definir el texto del modal
+  const refRoles = useRef(); // ref para el dropdown
+  const refAsuntos = useRef(); // ref para el dropdown
 
-  async function getQuejas() {
+  async function getReportes() {
     var url =
       process.env.NEXT_PUBLIC_backEnd +
       `gerente/obtener-tickets?tipo_ticket=${tipoTickets}&tipo_usuario=${tipoUsuarios}`;
@@ -164,7 +167,7 @@ export default function Reportes() {
   }
 
   useEffect(() => {
-    //getQuejas();
+    //getReportes();
     setDatos([{
         nombre_empleado:'Roberto Ozuna',
         rfc:"CTG211099RT6",
