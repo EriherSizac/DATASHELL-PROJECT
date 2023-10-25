@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import "./tyc.module.css";
 import styles from "./tyc.module.css";
 import Link from "next/link";
+import toast, { Toaster, ToastBar } from "react-hot-toast";
 export default function TYC() {
   const [user, setuser] = useState(null); // Estado para guardar el identificador de usuario
   const searchParams = useSearchParams(); // Para buscar los query params
@@ -24,6 +25,7 @@ export default function TYC() {
     }
   }, []);
 
+  // Función que hace una llamada a la API para aceptar los TyC
   function aceptarTyc() {
     const acceptTyc = async () => {
       const response = await fetch(
@@ -42,11 +44,14 @@ export default function TYC() {
       );
 
       const data = await response.json();
-        if(response.ok){
-          setaccepted(true);
-        }
-      console.log(data);
+      if (response.ok) {
+        setaccepted(true); // cambiamos el estado para mostrar el mensaje de exito
+      }
+      else{
+        toast('Ocurrió un error, vuelve a intentarlo. Código: ' + data.error)
+      }
     };
+    // Ejecutamos la llamada a la api si y solo si tenemos un query param
     if (user != null) {
       acceptTyc();
     }
@@ -54,6 +59,15 @@ export default function TYC() {
 
   return !accepted ? (
     <div className="flex flex-col content-center items-center gap-10 min-h-screen justify-center pt-[7rem] pb-5">
+      <Toaster position="bottom-center">
+        {(t) => (
+          <ToastBar
+            toast={t}
+            //style={{}} // Overwrite styles
+            position="bottom-center" // Used to adapt the animation
+          />
+        )}
+      </Toaster>
       <div className={` ${styles.test}`}>
         <p
           style={{
@@ -1069,7 +1083,13 @@ export default function TYC() {
     <div className="flex flex-col content-center items-center gap-10 min-h-screen justify-center pt-[7rem] pb-5 text-center">
       <h1>Aceptaste nuestros términos y condiciones</h1>
       <div className="text-xl">Ya puedes hacer uso de nuestro servicio.</div>
-      <Link href="https://api.whatsapp.com/send?phone=5215525392003" target="_blank" className="text-md underline">Regresa a Whatsapp para continuar</Link>
+      <Link
+        href="https://api.whatsapp.com/send?phone=5215525392003"
+        target="_blank"
+        className="text-md underline"
+      >
+        Regresa a Whatsapp para continuar
+      </Link>
     </div>
   );
 }
