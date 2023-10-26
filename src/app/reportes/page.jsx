@@ -10,32 +10,62 @@
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/Table/dataTable";
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-import Modal from "@/components/Modal/Modal";
-import { data } from "autoprefixer";
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css"; // theme css file
+import { DateRangePicker } from "react-date-range";
+
+function formatDate(timestamp) {
+  // Función que parsea un timestamp a dd/mm/yyyy
+  const date = new Date(timestamp);
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
+
+function formatFloatWithTwoDecimals(number) {
+  // función que coloca dos decimales siempre a un float
+  if (isNaN(number)) {
+    return "Invalid number";
+  }
+
+  // Use toFixed to round to two decimals
+  const formattedNumber = parseFloat(number).toFixed(2);
+
+  return formattedNumber;
+}
 
 export default function Reportes() {
   const [errorMessage, setErrorMessage] = useState(null); // para mostrar errores
   const [datos, setDatos] = useState(null); // para guardar los datos
-  const [tipoTickets, setTipoTickets] = useState("todos"); // para los filtros
-  const [tipoUsuarios, setTipoUsuarios] = useState("todos"); // para los filtros
-  const tipos_usuario = ["empleado", "operador", "gerente"]; // para el dropdown
-  const [isOpenModal, setIsOpenMOdal] = useState(false);//para el modal
-  const tipos_ticket = ["queja", "sugerencia", "otro"];//para el dropdown
-  const [selectedIndex, setSelectedIndex] = useState(-1); // para saber cual está seleccionado
-  const [modalHeader, setModalHeader] = useState("");//para definir el texto del modal
+  const [isOpenModal, setIsOpenMOdal] = useState(false); //para el modal
+  const [DatosCsv, setDatosCsv] = useState({}); // para guardar los datos a descargar
+
   const refRoles = useRef(); // ref para el dropdown
   const refAsuntos = useRef(); // ref para el dropdown
+  const montos_filtro = ["500", "1000"]; // estado para guardar los montos a renderizar para filtro
+  const [bancosFiltro, setbancosFiltro] = useState([]); // Estado para guardar los bancos para renderizar para el sorting
+  const [appliedFilters, setappliedFilters] = useState({
+    fecha_inicio: new Date(),
+    fecha_fin: new Date(),
+    bancos: [],
+    montos: [montos_filtro[0]],
+    empresas: ["Din Express"],
+  });
 
-  async function getReportes() {
+  // Función que obtiene todos los bancos disponibles y los coloca en el dropdown
+  async function getBancos() {
     var url =
-      process.env.NEXT_PUBLIC_backEnd +
-      `gerente/obtener-tickets?tipo_ticket=${tipoTickets}&tipo_usuario=${tipoUsuarios}`;
+      process.env.NEXT_PUBLIC_backEnd + "gerente/obtener-bancos?reverse=false";
+    var authToken = localStorage.getItem("authToken");
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
       },
     }).catch((error) => {
       console.log(error);
@@ -44,173 +74,122 @@ export default function Reportes() {
       const json = await response.json();
       if (response.status == 200) {
         console.log(json);
-        //setDatos(json);
-        setDatos([{
-            nombre_empleado:'Roberto Ozuna',
-            rfc:"CTG211099RT6",
-            empresa: "Auto Zone de Mexico",
-            contrato: "Mxl1/07",
-            fecha_solicitud:"15/09/2023",
-            fecha_deposito:"16/09/2023",
-            num_cuenta:"175779702",
-            banco:"Bancomer",
-            solicitado:"1000.00",
-            gastos_adm:"60.00",
-            com_banc:"5.80",
-            sub_total:"65.80",
-            iva:"10.53",
-            transferencia:"923.67"
+        setbancosFiltro(json);
+        setappliedFilters({ ...appliedFilters, bancos: [json[0].nombre] });
+      } else {
+        console.log(json);
+      }
+    } else {
+    }
+  }
 
-        }])
+  async function getReportes() {
+    var url = process.env.NEXT_PUBLIC_backEnd + `gerente/generar-reporte`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        fechas: [
+          formatDate(appliedFilters.fecha_inicio),
+          formatDate(appliedFilters.fecha_fin),
+        ],
+        bancos: appliedFilters.bancos,
+        montos: appliedFilters.montos,
+        empresas: ["Din Express"],
+      }),
+    }).catch((error) => {
+      console.log(error);
+    });
+    if (response != null) {
+      const json = await response.json();
+      if (response.status == 200) {
+        console.log(json);
+        setDatos(json.DatosTabla);
+        setDatosCsv(json.DatosCsv);
       } else {
         if (response.status == 401) {
           setIsOpenMOdal(true);
         }
         console.log(json);
-        //setErrorMessage(json.error);
+        setErrorMessage(json.error);
         setDatos([]);
       }
-      
     }
   }
 
-  function limpiarFiltros(e) {
-    e.preventDefault();
-    setTipoTickets("todos");
-    setTipoUsuarios("todos");
-    refRoles.current.selectedIndex = 0;
-    refAsuntos.current.selectedIndex = 0;
-  }
-
-  function verDetalle(index) {
-    if (index == -1) {
-      return <div></div>;
+  const handleMultiSelectChange = (name, id) => {
+    // Función que modifica los filtros de multiselect
+    if (name === "bancos_filtro") {
+      let bancos = [];
+      if (appliedFilters.bancos.includes(id)) {
+        bancos = appliedFilters.bancos.filter((item) => item !== id);
+        setappliedFilters({ ...appliedFilters, bancos });
+      } else {
+        setappliedFilters({
+          ...appliedFilters,
+          bancos: [...appliedFilters.bancos, id],
+        });
+      }
+    } else {
+      let montos = [];
+      if (appliedFilters.montos.includes(id)) {
+        montos = appliedFilters.montos.filter((item) => item !== id);
+        setappliedFilters({ ...appliedFilters, montos });
+      } else {
+        montos = [...appliedFilters.montos, id];
+        setappliedFilters({ ...appliedFilters, montos: montos });
+      }
     }
-    var ticket = tickets[index];
+  };
 
-    return (
-      <div className="pl-5 pr-5 rounded flex flex-col gap-4 w-full">
-        <h4>
-          {ticket.asunto} -{" "}
-          {ticket.tipo_usuario.charAt(0).toUpperCase() +
-            ticket.tipo_usuario.slice(1)}
-        </h4>
-        <div>Fecha: {ticket.fecha}</div>
-        <div className="flex flex-col gap-1">
-          Mensaje
-          <div className="p-4 border-black border rounded w-full break-words ">
-            {ticket.descripcion}
-          </div>
-        </div>
-        <div>
-          {ticket.contacto != "" && ticket.tipo_contacto == "telefono" ? (
-            <Link
-              href={`https://api.whatsapp.com/send?phone=${ticket.contacto}`}
-              target="_blank"
-              className={` flex justify-left items-left text-center transition duration-100 hover:italic hover:font-bold hover:text-yellow-400`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                xmlnsXlink="http://www.w3.org/1999/xlink"
-                aria-hidden="true"
-                role="img"
-                className="w-9 h-7"
-                width="100%"
-                height="100%"
-                preserveAspectRatio="xMidYMid meet"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fill="currentColor"
-                  d="M19.05 4.91A9.816 9.816 0 0 0 12.04 2c-5.46 0-9.91 4.45-9.91 9.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91c0-2.65-1.03-5.14-2.9-7.01zm-7.01 15.24c-1.48 0-2.93-.4-4.2-1.15l-.3-.18l-3.12.82l.83-3.04l-.2-.31a8.264 8.264 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24c2.2 0 4.27.86 5.82 2.42a8.183 8.183 0 0 1 2.41 5.83c.02 4.54-3.68 8.23-8.22 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81c-.23-.08-.39-.12-.56.12c-.17.25-.64.81-.78.97c-.14.17-.29.19-.54.06c-.25-.12-1.05-.39-1.99-1.23c-.74-.66-1.23-1.47-1.38-1.72c-.14-.25-.02-.38.11-.51c.11-.11.25-.29.37-.43s.17-.25.25-.41c.08-.17.04-.31-.02-.43s-.56-1.34-.76-1.84c-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31c-.22.25-.86.85-.86 2.07c0 1.22.89 2.4 1.01 2.56c.12.17 1.75 2.67 4.23 3.74c.59.26 1.05.41 1.41.52c.59.19 1.13.16 1.56.1c.48-.07 1.47-.6 1.67-1.18c.21-.58.21-1.07.14-1.18s-.22-.16-.47-.28z"
-                ></path>
-              </svg>
-              {ticket.contacto}
-            </Link>
-          ) : (
-            ticket.tipo_contacto == "correo" && (
-              <Link
-                href={`mailto:${ticket.contacto}`}
-                className={` flex justify-left items-left text-center transition duration-100 hover:italic hover:font-bold hover:text-yellow-400`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlnsXlink="http://www.w3.org/1999/xlink"
-                  aria-hidden="true"
-                  role="img"
-                  className="w-9 h-7"
-                  width="100%"
-                  height="100%"
-                  preserveAspectRatio="xMidYMid meet"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5l-8-5V6l8 5l8-5v2z"
-                  ></path>
-                </svg>
-                {ticket.contacto}
-              </Link>
-            )
-          )}
-          {ticket.contacto == "" && <div>No solicitó datos de contacto</div>}
-        </div>
-      </div>
-    );
-  }
-
-  function handleAsuntos(e) {
-    setTipoTickets(e.target.value);
-  }
-  function handleRoles(e) {
-    setTipoUsuarios(e.target.value);
+  function handleDateRangeChange(e) {
+    const { endDate, startDate } = e.selection;
+    console.log(endDate, startDate);
+    setappliedFilters({
+      ...appliedFilters,
+      fecha_inicio: startDate,
+      fecha_fin: endDate,
+    });
   }
 
   useEffect(() => {
-    //getReportes();
-    setDatos([{
-        nombre_empleado:'Roberto Ozuna',
-        rfc:"CTG211099RT6",
-        empresa: "Auto Zone de Mexico",
-        contrato: "Mxl1/07",
-        fecha_solicitud:"15/09/2023",
-        fecha_deposito:"16/09/2023",
-        num_cuenta:"175779702",
-        banco:"Bancomer",
-        solicitado:"1000.00",
-        gastos_adm:"60.00",
-        com_banc:"5.80",
-        sub_total:"65.80",
-        iva:"10.53",
-        transferencia:"923.67"
-
-    }])
+    // Obtenemos los bancos para los filtros
+    getBancos();
+    document.querySelector(".rdrDefinedRangesWrapper").style.display = "none";
+    setTimeout(() => {
+      document.querySelector("#loader").style.opacity = "0";
+      setTimeout(() => {
+        document.querySelector("#loader").style.display = "none";
+      }, 200);
+    }, 200);
   }, []);
 
   useEffect(() => {
-    //getQuejas();
-  }, [tipoTickets, tipoUsuarios]);
+    //Obtenemos los reportes cada vez que cambian los filtros
+    getReportes();
+  }, [appliedFilters]);
 
   const columns = [
-    //we can set normal fields like this
     {
-      accessorKey: "nombre_empleado",
+      accessorKey: "a_empleado",
       header: "Nombre Empleado",
     },
     {
-      accessorKey: "rfc",
+      accessorKey: "b_rfc",
       header: "RFC",
     },
     {
-      accessorKey: "empresa",
+      accessorKey: "c_empresa",
       header: "Empresa",
     },
     {
-      accessorKey: "contrato",
+      accessorKey: "d_id_adelanto",
       header: "# Contrato",
     },
     {
-      accessorKey: "fecha_solicitud",
+      accessorKey: "e_fecha",
       header: ({ column }) => {
         return (
           <Button
@@ -224,7 +203,7 @@ export default function Reportes() {
       },
     },
     {
-      accessorKey: "fecha_deposito",
+      accessorKey: "f_fecha_pago",
       header: ({ column }) => {
         return (
           <Button
@@ -238,144 +217,163 @@ export default function Reportes() {
       },
     },
     {
-      accessorKey: "num_cuenta",
+      accessorKey: "g_numero_cuenta",
       header: "Numero Cuenta",
     },
     {
-      accessorKey: "banco",
+      accessorKey: "h_nombre_banco",
       header: "Banco",
     },
     {
-      accessorKey: "solicitado",
+      accessorKey: "i_solicitado",
       header: "Solicitado",
       cell: (row) => {
-        return (
-          `$${row.getValue('solicitado')}`
-        );
+        return `$${row.getValue("solicitado")}`;
       },
     },
     {
-      accessorKey: "gastos_adm",
+      accessorKey: "j_gastos_admin",
       header: "Gastos Adm. Interés",
       cell: (row) => {
-        return (
-          `$${row.getValue('gastos_adm')}`
-        );
+        return `$${formatFloatWithTwoDecimals(row.getValue("gastos_adm"))}`;
       },
     },
     {
-      accessorKey: "com_banc",
+      accessorKey: "k_comision_bancaria",
       header: "Comisión Bancaria",
       cell: (row) => {
-        return (
-          `$${row.getValue('com_banc')}`
-        );
+        return `$${formatFloatWithTwoDecimals(row.getValue("com_banc"))}`;
       },
     },
     {
-      accessorKey: "sub_total",
+      accessorKey: "l_subtotal",
       header: "Sub. Total",
       cell: (row) => {
-        return (
-          `$${row.getValue('sub_total')}`
-        );
+        return `$${formatFloatWithTwoDecimals(row.getValue("sub_total"))}`;
       },
     },
     {
-      accessorKey: "iva",
+      accessorKey: "m_iva",
       header: "IVA",
       cell: (row) => {
-        return (
-          `$${row.getValue('iva')}`
-        );
+        return `$${formatFloatWithTwoDecimals(row.getValue("iva"))}`;
       },
     },
     {
-      accessorKey: "transferencia",
+      accessorKey: "n_transferencia",
       header: "Transferencia",
       cell: (row) => {
-        return (
-          `$${row.getValue('transferencia')}`
-        );
+        return `$${formatFloatWithTwoDecimals(row.getValue("transferencia"))}`;
       },
-    }
+    },
   ];
 
   return (
-    <div className="flex flex-col content-center items-start gap-5 min-h-screen justify-start pt-24">
-      <Modal></Modal>
-      <div className="container mx-auto py-10">
-        <Modal
-          isOpen={selectedIndex != -1}
-          onClose={() => setSelectedIndex(-1)}
-          buttonCloseText="Cerrar"
-          modalHeader={modalHeader}
-          sizeW="max-w-2xl"
-        >
-          {verDetalle(selectedIndex)}
-        </Modal>
-        <div className="hidden">
-          <div className="pb-1">Filtros adicionales</div>
-          <form className="flex flex-row sm:flex-row sm:items-center flex-wrap sm:flex-nowrap sm:justify-start gap-4">
-            <div className="flex flex-row gap-4 w-full sm:w-1/2">
-              <select
-                ref={refAsuntos}
-                className="p-2 cursor-pointer border border-slate-700 shrink-0 sm:shrink rounded w-[48%] sm:w-full"
-                onChange={(e) => {
-                  handleAsuntos(e);
-                }}
-              >
-                <option value="todos">Todos los asuntos</option>
-                {tipos_ticket.map((usuario, key) => {
-                  return (
-                    <option value={usuario} key={key}>
-                      {usuario.charAt(0).toUpperCase() + usuario.slice(1)}
-                    </option>
-                  );
-                })}
-              </select>
-              <select
-                ref={refRoles}
-                className="p-2 cursor-pointer border border-slate-700 rounded w-[48%] shrink-0 sm:shrink sm:w-full"
-                onChange={(e) => {
-                  handleRoles(e);
-                }}
-              >
-                <option value="todos">Todos los roles</option>
-                {tipos_usuario.map((usuario, key) => {
-                  return (
-                    <option value={usuario} key={key}>
-                      {usuario.charAt(0).toUpperCase() + usuario.slice(1)}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-            <button
-              className="p-2 bg-black text-white rounded w-content shrink-0 sm:shrink"
-              onClick={(e) => limpiarFiltros(e)}
-            >
-              Limpiar
-            </button>
-          </form>
+    <>
+      <div className="overflow-y-auto pb-[40vh] sm:pb-0 flex flex-col fixed transition-all duration-200 ease bg-yellow-400 translate-y-[90vh] lg:translate-y-[90vh] hover:translate-y-[25vh] 2xl:hover:translate-y-[50vh] h-screen z-[999] border border-black rounded-[8px] p-2 w-full shadow-2xl ml-[-1.25rem]">
+        <div className="pb-1 w-full text-center text-xl font-bold">
+          Filtros adicionales
         </div>
-        {errorMessage != null && <div>{errorMessage}</div>}
-        {datos != null && (
-          <DataTable
-            columns={columns}
-            data={datos}
-            datosDescarga={{headers:Object.keys(datos), data:datos}}
-            headerTitle={"Reporte"}
-            headerDesc="Estos son los detalles del reporte"
-            ctaDesc="Dejar queja o sugerencia"
-            ctaVisible={false}
-            ctaLink="/quejas-y-sugerencias/nueva"
-            ctaPriv={["gerente"]}
-            filter_placeholder={"Buscar por numero de contrato"}
-            filter_key={"contrato"}
-          />
-        )}
+        <form className="flex flex-row sm:flex-row sm:items-start flex-wrap sm:flex-nowrap sm:justify-start gap-4">
+          <div className="flex flex-col gap-4 w-full sm:w-full">
+            <div className="flex flex-col">
+              <div>Selecciona los bancos para filtrar</div>
+              <div className="flex flex-row max-w-screen sm:max-w-1/4 gap-4 flex-wrap bg-yellow-500 p-5 rounded-[8px] max-h-[10rem] overflow-y-auto noBar">
+                {bancosFiltro.map((banco) => {
+                  return (
+                    <div
+                      key={banco.id}
+                      onClick={() => {
+                        handleMultiSelectChange("bancos_filtro", banco.nombre);
+                      }}
+                      className={`cursor-pointer transition-all ease duration-200 cursor pointer shrink-0 w-max p-2 rounded-[10px] ${
+                        appliedFilters.bancos?.includes(banco.nombre)
+                          ? "bg-yellow-400"
+                          : "bg-white"
+                      } ${
+                        appliedFilters.bancos?.includes(banco.nombre)
+                          ? "hover:bg-white"
+                          : "hover:bg-yellow-400"
+                      }`}
+                    >
+                      {banco.nombre}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <div>Selecciona los montos para filtrar</div>
+              <div className="flex flex-row max-w-screen sm:max-w-1/4 gap-4 flex-wrap bg-yellow-500 p-5 rounded-[8px] max-h-[10rem] overflow-y-auto noBar">
+                {montos_filtro.map((monto, key) => {
+                  return (
+                    <div
+                      key={key}
+                      onClick={() => {
+                        handleMultiSelectChange("montos_filtro", monto);
+                      }}
+                      className={`cursor-pointer transition-all ease duration-200 cursor pointer shrink-0 w-max p-2 rounded-[10px] ${
+                        appliedFilters.montos?.includes(monto)
+                          ? "bg-yellow-400"
+                          : "bg-white"
+                      } ${
+                        appliedFilters.montos?.includes(monto)
+                          ? "hover:bg-white"
+                          : "hover:bg-yellow-400"
+                      }`}
+                    >
+                      {monto}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-row gap-4 w-full sm:w-1/2">
+            <div className="flex flex-col">
+              <div>Selecciona la fecha inicial</div>
+
+              <DateRangePicker
+                ranges={[
+                  {
+                    startDate: appliedFilters.fecha_inicio,
+                    endDate: appliedFilters.fecha_fin,
+                    key: "selection",
+                  },
+                ]}
+                dateDisplayFormat="d/MMM/yyyy"
+                onChange={(e) => {
+                  handleDateRangeChange(e);
+                }}
+              />
+            </div>
+          </div>
+        </form>
       </div>
-    </div>
+      <div className="flex flex-col content-center items-start gap-5 min-h-screen justify-start pt-24 pb-12">
+        <div
+          className="absolute w-screen h-screen bg-yellow-400 z-[9999] transition-all ease duration-200"
+          id="loader"
+        ></div>
+        <div className="container mx-auto py-10">
+          {errorMessage != null && <div>{errorMessage}</div>}
+          {datos != null && (
+            <DataTable
+              columns={columns}
+              data={datos}
+              datosDescarga={DatosCsv}
+              headerTitle={"Reporte"}
+              headerDesc="Estos son los detalles del reporte"
+              ctaDesc="Dejar queja o sugerencia"
+              ctaVisible={false}
+              ctaLink="/quejas-y-sugerencias/nueva"
+              ctaPriv={["gerente"]}
+              filter_placeholder={"Buscar por RFC"}
+              filter_key={"b_rfc"}
+            />
+          )}
+        </div>
+      </div>
+    </>
   );
 }

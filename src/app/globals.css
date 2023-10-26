@@ -15,7 +15,23 @@
     --background-end-rgb: 0, 0, 0;
   }
 }
+@layer base{
+  .noBar::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 4rem;
+  }
+  .noBar::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px #ad9083;
+    border-radius: 10px;
+  }
 
+  .noBar::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px #732c0b;
+  }
+
+  .noBar{}
+}
 .body-no-scroll {
   overflow: hidden;
 }

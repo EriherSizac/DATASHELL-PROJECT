@@ -172,13 +172,13 @@ export function DataTable({
         />
       </div>
       <div className="rounded-xl border overflow-hidden">
-        <div className="rounded-md border flex w-full items-center pr-3 bg-white">
+        <div className="rounded-md border flex flex-col sm:flex-row w-full items-left pb-4 sm:items-center pr-3 bg-white">
           <div className=" flex flex-col p-3 w-full">
             <h1 className="text-xl bold w-max">{headerTitle}</h1>
             <div>{headerDesc}</div>
           </div>
 
-          <div className="flex flex-row gap-4">
+          <div className="flex flex-col sm:flex-row items-left pl-2 sm:pl-0 sm:items-center flex-row gap-4">
             <div>
               {ctaPriv.indexOf(privilegios) != -1 &&
                 ctaVisible &&
