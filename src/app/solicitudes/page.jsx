@@ -23,7 +23,7 @@ export default function Solicitudes() {
   const [monto, setMonto] = useState("todos"); // para los filtros por monto
   const [estatus, setEstatus] = useState("todos"); // para los filtros por estatus
   const [isOpenModal, setIsOpenMOdal] = useState(false); // para controlar el modal
-  const { privilegios } = useAuth(); // para verificar privilegios
+  const { privilegios, loadingToast } = useAuth(); // para verificar privilegios
   const montos_dropdown = ["500", "1000"]; // para el filtro de mopntos
   const estatus_dropdown = ["creado", "pagado", "cancelado"]; // para el filtro de estatus
   const [empleadoDetalles, setEmpleadoDetalles] = useState(-1); // para guardar la solicitud
@@ -36,6 +36,7 @@ export default function Solicitudes() {
     var url =
       process.env.NEXT_PUBLIC_backEnd +
       `gerente/obtener-adelantos?monto=${monto}&estatus_adelanto=${estatus}`;
+      loadingToast("Obteniendo datos", "empleados", "pending");
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -43,11 +44,13 @@ export default function Solicitudes() {
       },
     }).catch((error) => {
       console.log(error);
+      loadingToast('Error: ' + error, "empleados", "error");
     });
     if (response != null) {
       const json = await response.json();
       if (response.status == 200) {
         console.log(json);
+        loadingToast('Datos cargados', "empleados", "success");
         setAdelantos(json.DatosTabla);
         setDatosCsv(json.DatosCsv);
       } else {
@@ -57,6 +60,7 @@ export default function Solicitudes() {
         console.log(json);
         //setErrorMessage(json.error);
         setAdelantos([]);
+        loadingToast('Error: ' + json.error, "empleados", "error");
       }
     }
   }
@@ -337,7 +341,6 @@ export default function Solicitudes() {
 
   return (
     <div className="flex flex-col content-center items-start gap-5 min-h-screen justify-start pt-24">
-      <Toaster />
       <div className="container mx-auto py-10">
         <Modal
           isOpen={isOpenModal}
@@ -400,6 +403,7 @@ export default function Solicitudes() {
             ctaPriv={["gerente", "operador"]}
             filter_placeholder={"Buscar por RFC"}
             filter_key={"rfc"}
+            refresh={getSolicitudes}
           />
         )}
       </div>

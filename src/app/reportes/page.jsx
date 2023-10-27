@@ -14,6 +14,7 @@ import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 import { DateRangePicker } from "react-date-range";
+import { useAuth } from "@/components/AuthComponent";
 
 function formatDate(timestamp) {
   // Función que parsea un timestamp a dd/mm/yyyy
@@ -43,7 +44,7 @@ export default function Reportes() {
   const [datos, setDatos] = useState(null); // para guardar los datos
   const [isOpenModal, setIsOpenMOdal] = useState(false); //para el modal
   const [DatosCsv, setDatosCsv] = useState({}); // para guardar los datos a descargar
-
+  const {  loadingToast } = useAuth(); // obtenemos para hacer el toast
   const refRoles = useRef(); // ref para el dropdown
   const refAsuntos = useRef(); // ref para el dropdown
   const montos_filtro = ["500", "1000"]; // estado para guardar los montos a renderizar para filtro
@@ -85,6 +86,7 @@ export default function Reportes() {
 
   async function getReportes() {
     var url = process.env.NEXT_PUBLIC_backEnd + `gerente/generar-reporte`;
+    loadingToast('Obteniendo datos', "empleados", "pending");
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -101,20 +103,23 @@ export default function Reportes() {
       }),
     }).catch((error) => {
       console.log(error);
+      loadingToast('Error: ' + error, "empleados", "error");
     });
     if (response != null) {
       const json = await response.json();
       if (response.status == 200) {
-        console.log(json);
+        loadingToast('Datos cargados', "empleados", "success");
         setDatos(json.DatosTabla);
         setDatosCsv(json.DatosCsv);
       } else {
         if (response.status == 401) {
           setIsOpenMOdal(true);
+          loadingToast('Error: ' + json.error, "empleados", "error");
         }
         console.log(json);
         setErrorMessage(json.error);
         setDatos([]);
+        loadingToast('Error: ' + json.error, "empleados", "error");
       }
     }
   }
@@ -370,6 +375,7 @@ export default function Reportes() {
               ctaPriv={["gerente"]}
               filter_placeholder={"Buscar por RFC"}
               filter_key={"b_rfc"}
+              refresh={getReportes}
             />
           )}
         </div>

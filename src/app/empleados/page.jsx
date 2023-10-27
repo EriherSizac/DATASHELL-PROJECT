@@ -27,6 +27,7 @@ export default function GestionEmpleados() {
     var url =
       process.env.NEXT_PUBLIC_backEnd +
       "operador/obtener-empleados?filtro=fecha&reverse=true";
+      loadingToast('Obteniendo datos', "empleados", "pending");
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -34,10 +35,12 @@ export default function GestionEmpleados() {
       },
     }).catch((error) => {
       console.log(error);
+      loadingToast('Error: ' + error, "empleados", "error");
     });
     if (response != null) {
       const json = await response.json();
       if (response.status == 200) {
+        loadingToast('Datos cargados', "empleados", "success");
         // Si todo bien, colocamos los datos en las varibles
         setEmpleados(json.DatosTabla);
         setCsv(json.DatosCsv);
@@ -47,6 +50,7 @@ export default function GestionEmpleados() {
         setCsv([]);
         // Y colocamos mensaje de error para que se muestre en pantalla
         setErrorMessage(json.error);
+        loadingToast('Error: ' + json.error, "empleados", "error");
       }
     }
   }
@@ -81,12 +85,13 @@ export default function GestionEmpleados() {
           );
         } else {
           loadingToast(
-            "Ocurrió un error: " + rdata.message,
+            "Ocurrió un error: " + rdata.error,
             "subiendocsv2",
             "error"
           );
         }
-        console.log(data);
+        console.log(rdata);
+        document.querySelector("#csvUp").value = "";
       }
     };
     if (data) {
@@ -215,6 +220,7 @@ export default function GestionEmpleados() {
             showSubirCsv={true}
             csvAction={uploadAll}
             subirCsvText={"Subir empleados con un csv"}
+            refresh={getEmpleados}
           />
         )}
       </div>

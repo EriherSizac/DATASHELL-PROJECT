@@ -12,26 +12,29 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import Modal from "@/components/Modal/Modal";
+import { useAuth } from "@/components/AuthComponent";
 
 export default function QuejasYSugerencias() {
   const [errorMessage, setErrorMessage] = useState(null); // para mostrar errores
   const [tickets, setTickets] = useState(null); // para guardar los tickets
-  const [csv, setCsv] = useState({}) // para guardar la info descargable
+  const [csv, setCsv] = useState({}); // para guardar la info descargable
   const [tipoTickets, setTipoTickets] = useState("todos"); //filtro
   const [tipoUsuarios, setTipoUsuarios] = useState("todos"); // filtro
-  const tipos_usuario = ["empleado", "operador", "gerente"];// datos dropdown filtro
+  const tipos_usuario = ["empleado", "operador", "gerente"]; // datos dropdown filtro
   const [isOpenModal, setIsOpenMOdal] = useState(false); // estado del modal de informacion
   const tipos_ticket = ["queja", "sugerencia", "otro"]; // datos dropdown filtro
   const [selectedIndex, setSelectedIndex] = useState(-1); // index ticket seleccionado
   const [modalHeader, setModalHeader] = useState(""); // titulo del modal
   const refRoles = useRef(); // ref del dropdown
   const refAsuntos = useRef(); // ref del dropdown
+  const { loadingToast } = useAuth(); // obtenemos para hacer toasts
 
   // función que obtiene todas las quejas
   async function getQuejas() {
     var url =
       process.env.NEXT_PUBLIC_backEnd +
       `gerente/obtener-tickets?tipo_ticket=${tipoTickets}&tipo_usuario=${tipoUsuarios}`;
+    loadingToast("Obteniendo datos", "empleados", "pending");
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -39,12 +42,14 @@ export default function QuejasYSugerencias() {
       },
     }).catch((error) => {
       console.log(error);
+      loadingToast("Error: " + error, "empleados", "error");
     });
     if (response != null) {
       const json = await response.json();
       if (response.status == 200) {
         setTickets(json.DatosTabla);
         setCsv(json.DatosCsv);
+        loadingToast("Datos cargados", "empleados", "success");
       } else {
         if (response.status == 401) {
           setIsOpenMOdal(true);
@@ -52,6 +57,7 @@ export default function QuejasYSugerencias() {
         console.log(json);
         //setErrorMessage(json.error);
         setTickets([]);
+        loadingToast("Error: " + json.error, "empleados", "error");
       }
     }
   }
@@ -239,10 +245,10 @@ export default function QuejasYSugerencias() {
         <div>
           <div className="pb-1">Filtros adicionales</div>
           <form className="flex flex-row sm:flex-row sm:items-center flex-wrap sm:flex-nowrap sm:justify-start gap-4">
-            <div className="flex flex-row gap-4 w-full">
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
               <select
                 ref={refAsuntos}
-                className="p-2 cursor-pointer border border-slate-700 shrink-0 sm:shrink rounded w-[48%] sm:w-full"
+                className="p-2 cursor-pointer border border-slate-700 shrink-0 sm:shrink rounded w-full sm:w-max"
                 onChange={(e) => {
                   handleAsuntos(e);
                 }}
@@ -258,7 +264,7 @@ export default function QuejasYSugerencias() {
               </select>
               <select
                 ref={refRoles}
-                className="p-2 cursor-pointer border border-slate-700 rounded w-[48%] shrink-0 sm:shrink sm:w-full"
+                className="p-2 cursor-pointer border border-slate-700 rounded w-full sm:w-max shrink-0 sm:shrink "
                 onChange={(e) => {
                   handleRoles(e);
                 }}
@@ -272,13 +278,13 @@ export default function QuejasYSugerencias() {
                   );
                 })}
               </select>
+              <button
+                className="p-2 bg-black text-white rounded w-full sm:w-max shrink-0 sm:shrink"
+                onClick={(e) => limpiarFiltros(e)}
+              >
+                Limpiar
+              </button>
             </div>
-            <button
-              className="p-2 bg-black text-white rounded w-full shrink-0 sm:shrink"
-              onClick={(e) => limpiarFiltros(e)}
-            >
-              Limpiar
-            </button>
           </form>
         </div>
         {errorMessage != null && <div>{errorMessage}</div>}
@@ -295,6 +301,7 @@ export default function QuejasYSugerencias() {
             ctaPriv={["operador", "gerente", "empleado"]}
             filter_placeholder={"Buscar por asunto"}
             filter_key={"asunto"}
+            refresh={getQuejas}
           />
         )}
       </div>

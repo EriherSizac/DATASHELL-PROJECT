@@ -52,6 +52,7 @@ export function DataTable({
   showSubirCsv, // si muestra  o no el boton para cargar un csv
   csvAction, // qué hará despues de cargar el csv
   subirCsvText, // texto del boton
+  refresh, // funcion a ejecutar al dar clic al boton de refrescar
 }) {
   // and now we will use this useReactTable hook
   const [sorting, setSorting] = React.useState([]);
@@ -96,7 +97,7 @@ export function DataTable({
 
   // Función para cuando cambia el input file
   const handleFileChange = (e) => {
-    loadingToast('Leyendo datos', 'subiendocsv', 'pending')
+    loadingToast("Leyendo datos", "subiendocsv", "pending");
     setError("");
     // Verifica que haya un file
     if (e.target.files.length) {
@@ -106,7 +107,7 @@ export function DataTable({
       const fileExtension = inputFile?.type.split("/")[1];
       if (!allowedExtensions.includes(fileExtension)) {
         //setError("Por favor sube un archivo csv");
-        loadingToast('Sube un archivo csv', 'subiendocsv', 'error')
+        loadingToast("Sube un archivo csv", "subiendocsv", "error");
         return;
       }
       // Si todo bien, coloca el archvo en el estado
@@ -118,7 +119,8 @@ export function DataTable({
   const handleParse = () => {
     // If user clicks the parse button without
     // a file we show a error
-    if (!file) return loadingToast('Sube un archivo csv', 'subiendocsv', 'error')
+    if (!file)
+      return loadingToast("Sube un archivo csv", "subiendocsv", "error");
 
     // Initialize a reader which allows user
     // to read any file or blob.
@@ -132,7 +134,7 @@ export function DataTable({
       });
       const parsedData = csv?.data;
       console.log(parsedData);
-     /*  const rows = Object.keys(parsedData[0]);
+      /*  const rows = Object.keys(parsedData[0]);
 
       const columns = Object.values(parsedData[0]);
       const res = rows.reduce((acc, e, i) => {
@@ -140,24 +142,24 @@ export function DataTable({
       }, []); */
       console.log(parsedData);
       setparsedData(parsedData);
-      loadingToast('Datos procesados con exito', 'subiendocsv', 'success');
-      loadingToast('Subiendo datos al servidor', 'subiendocsv2', 'pending');
+      loadingToast("Datos procesados con exito", "subiendocsv", "success");
+      loadingToast("Subiendo datos al servidor", "subiendocsv2", "pending");
     };
     reader.readAsText(file);
   };
 
-  React.useEffect(()=>{
-    console.log('parsed', parsedData)
-    if(parsedData.length > 0){
+  React.useEffect(() => {
+    console.log("parsed", parsedData);
+    if (parsedData.length > 0) {
       csvAction(parsedData, setparsedData, setFile);
     }
-  }, [parsedData])
+  }, [parsedData]);
 
-  React.useEffect(()=>{
-    if(file != ""){
+  React.useEffect(() => {
+    if (file != "") {
       handleParse();
     }
-  }, [file])
+  }, [file]);
 
   return (
     <div className="">
@@ -179,53 +181,64 @@ export function DataTable({
           </div>
 
           <div className="flex flex-col sm:flex-row items-left pl-2 sm:pl-0 sm:items-center flex-row gap-4">
-            <div>
-              {ctaPriv.indexOf(privilegios) != -1 &&
-                ctaVisible &&
-                ctaLink != "" && (
-                  <Link
-                    href={ctaLink}
-                    className="block bg-black text-white rounded p-3 w-max cursor-pointer"
-                  >
-                    {ctaDesc}
-                  </Link>
-                )}
-            </div>
-            <div>
-              {privilegios == "gerente" && datosDescarga != null && (
-                <>
-                  <div
-                    className="block bg-black text-white rounded p-3 w-max cursor-pointer"
-                    onClick={() => {
-                      document.getElementById("here").click();
-                    }}
-                  >
-                    Descargar tabla como CSV
-                  </div>
-                  <CsvDownloadButton
-                    id="here"
-                    className="hidden"
-                    headers={datosDescarga.headers}
-                    data={datosDescarga.data}
-                    filename={headerTitle + ".csv"}
-                    delimiter=","
-                  />
-                </>
+            {ctaPriv.indexOf(privilegios) != -1 &&
+              ctaVisible &&
+              ctaLink != "" && (
+                <Link
+                  href={ctaLink}
+                  className="block bg-black text-white rounded p-3 w-max cursor-pointer"
+                >
+                  {ctaDesc}
+                </Link>
               )}
-            </div>
-            <div>
-              {showSubirCsv && privilegios == 'operador' && (
-                <>
-                  <label
-                    htmlFor="csvUp"
-                    className="block bg-black text-white rounded p-3 w-max cursor-pointer "
-                  >
-                    {subirCsvText}{" "}
-                  </label>
-                  <input id="csvUp" type="file" className="hidden" onChange={handleFileChange}/>
-                </>
-              )}
-            </div>
+            {privilegios == "gerente" && datosDescarga != null && (
+              <>
+                <div
+                  className="block bg-black text-white rounded p-3 w-max cursor-pointer"
+                  onClick={() => {
+                    document.getElementById("here").click();
+                  }}
+                >
+                  Descargar tabla como CSV
+                </div>
+                <CsvDownloadButton
+                  id="here"
+                  className="hidden"
+                  headers={datosDescarga.headers}
+                  data={datosDescarga.data}
+                  filename={headerTitle + ".csv"}
+                  delimiter=","
+                />
+              </>
+            )}
+
+            {showSubirCsv && privilegios == "operador" && (
+              <>
+                <label
+                  htmlFor="csvUp"
+                  className="block !mb-0 bg-black text-white rounded p-3 w-max cursor-pointer "
+                >
+                  {subirCsvText}{" "}
+                </label>
+                <input
+                  id="csvUp"
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </>
+            )}
+
+            {refresh && (
+              <>
+                <div
+                  onClick={refresh}
+                  className="block bg-black text-white rounded p-3 w-max cursor-pointer "
+                >
+                  Actualizar datos
+                </div>
+              </>
+            )}
           </div>
         </div>
 

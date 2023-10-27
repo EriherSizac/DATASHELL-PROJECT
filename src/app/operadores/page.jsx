@@ -6,7 +6,6 @@
  * @desc Página que muestra todos los operadores activos
  */
 
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -19,9 +18,9 @@ import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 export default function Operadores() {
   const [operadores, setOperadores] = useState(null); // para guardar la lista de operadores
-  const [csv, setCsv] = useState({}) // para guardar la info del csv a descargar
+  const [csv, setCsv] = useState({}); // para guardar la info del csv a descargar
   const [errorMessage, setErrorMessage] = useState(null); // para mostrar errores
-  const { privilegios } = useAuth(); // para saber los privilegios del usuario
+  const { privilegios, loadingToast } = useAuth(); // para saber los privilegios del usuario
   const router = useRouter();
 
   // función para obtener todos los operadores de la BD
@@ -29,6 +28,7 @@ export default function Operadores() {
     try {
       const url =
         process.env.NEXT_PUBLIC_backEnd + "gerente/obtener-operadores";
+      loadingToast("Obteniendo datos", "empleados", "pending");
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -42,12 +42,15 @@ export default function Operadores() {
       if (response.ok) {
         setOperadores(data.DatosTabla);
         setCsv(data.DatosCsv);
+        loadingToast("Datos cargados", "empleados", "success");
+      } else {
+        loadingToast("Error: " + json.error, "empleados", "error");
       }
     } catch (error) {
       console.log(error);
+      loadingToast('Error: ' + error, "empleados", "error");
     }
   };
-
 
   useEffect(() => {
     fetchData(); // obtenemos los datos al cargar la pag.
@@ -79,7 +82,9 @@ export default function Operadores() {
     },
     {
       accessorKey: "id",
-      header: () => {"Ver/Editar"},
+      header: () => {
+        "Ver/Editar";
+      },
       cell: ({ row }) => {
         if (privilegios == "gerente") {
           return (
@@ -116,6 +121,7 @@ export default function Operadores() {
             ctaPriv={["gerente"]}
             filter_placeholder={"Buscar por nombre"}
             filter_key={"nombre"}
+            refresh={fetchData}
           />
         )}
       </div>
