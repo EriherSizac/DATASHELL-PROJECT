@@ -62,13 +62,13 @@ export default function GestionEmpleados() {
             "Content-Type": "application/json",
           },
 
-          body: JSON.stringify(data),
+          body: JSON.stringify({ empleados: data }),
         }
       ).catch((error) => {
         loadingToast("Ocurrió un error: " + error, "subiendocsv2", "error");
         setParsed("");
         setFile("");
-        document.querySelector('#csvUp').value="";
+        document.querySelector("#csvUp").value = "";
       });
 
       if (response) {
