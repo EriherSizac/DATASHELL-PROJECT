@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthComponent";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import Papa from 'papaparse';
 
 export default function GestionEmpleados() {
   const [errorMessage, setErrorMessage] = useState(null); // para mostrar errores
@@ -55,7 +56,37 @@ export default function GestionEmpleados() {
     }
   }
 
+  // Función que recibe un array y lo descarga como csv
+  function downloadErrors(data) {
+    // Convert array of objects to CSV
+    const csv = Papa.unparse(data);
+  
+    // Create a Blob containing the CSV data
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  
+    // Create a download link
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+  
+    // Set the file name (you can customize it)
+    link.download = 'Coonflictos.csv';
+  
+    // Append the link to the document
+    document.body.appendChild(link);
+  
+    // Trigger a click on the link to initiate the download
+    link.click();
+  
+    // Remove the link from the document
+    document.body.removeChild(link);
+  
+    // Release the Blob URL
+    URL.revokeObjectURL(url);
+  }
+
   async function uploadAll(data, setParsed, setFile) {
+    // Función que sube un CSV a la base de datos
     const subirDatos = async () => {
       const response = await fetch(
         process.env.NEXT_PUBLIC_backEnd + "operador/subir-empleados-bulk",
@@ -79,10 +110,12 @@ export default function GestionEmpleados() {
         const rdata = await response.json();
         if (response.ok) {
           loadingToast(
-            "Los empleados se subieron con éxito",
+            rdata.exitoso + `. \n${rdata.errores.length > 0 ? "Se encontraron " + rdata.errores.length + " conflictos durante la subida." : "No hubieron conflictos durante la subida."}`,
             "subiendocsv2",
             "success"
           );
+          console.log(rdata);
+          rdata.errores.length > 0 && downloadErrors(rdata.errores)
         } else {
           loadingToast(
             "Ocurrió un error: " + rdata.error,
