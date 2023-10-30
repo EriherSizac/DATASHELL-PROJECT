@@ -46,9 +46,8 @@ export default function TYC() {
       const data = await response.json();
       if (response.ok) {
         setaccepted(true); // cambiamos el estado para mostrar el mensaje de exito
-      }
-      else{
-        toast('Ocurrió un error, vuelve a intentarlo. Código: ' + data.error)
+      } else {
+        toast("Ocurrió un error, vuelve a intentarlo. Código: " + data.error);
       }
     };
     // Ejecutamos la llamada a la api si y solo si tenemos un query param
@@ -1072,6 +1071,11 @@ export default function TYC() {
           variación del presente contrato en perjuicio del CONSUMIDOR, frente al
           contrato de adhesión registrado, se tendrá por no puesta.
         </h1>
+      </div>
+      <div>
+        El horario de servicio es de 08:30 am a 06:30 P.M. Cualquier solicitud
+        realizada después de este horario será considera a partir del siguiente
+        día hábil.
       </div>
       <div
         className="bg-black p-4 text-white w-full border border-black cursor-pointer text-center"
