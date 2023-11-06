@@ -87,20 +87,22 @@ export default function Reportes() {
   async function getReportes() {
     var url = process.env.NEXT_PUBLIC_backEnd + `gerente/generar-reporte`;
     loadingToast('Obteniendo datos', "empleados", "pending");
+    const datos = {
+      fechas: [
+        formatDate(appliedFilters.fecha_inicio),
+        formatDate(appliedFilters.fecha_fin),
+      ],
+      bancos: appliedFilters.bancos,
+      montos: appliedFilters.montos,
+      empresas: null,
+    }
+    console.log(datos)
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        fechas: [
-          formatDate(appliedFilters.fecha_inicio),
-          formatDate(appliedFilters.fecha_fin),
-        ],
-        bancos: appliedFilters.bancos,
-        montos: appliedFilters.montos,
-        empresas: ["Din Express"],
-      }),
+      body: JSON.stringify(datos),
     }).catch((error) => {
       console.log(error);
       loadingToast('Error: ' + error, "empleados", "error");
@@ -111,6 +113,7 @@ export default function Reportes() {
         loadingToast('Datos cargados', "empleados", "success");
         setDatos(json.DatosTabla);
         setDatosCsv(json.DatosCsv);
+        console.log(json)
       } else {
         if (response.status == 401) {
           setIsOpenMOdal(true);
