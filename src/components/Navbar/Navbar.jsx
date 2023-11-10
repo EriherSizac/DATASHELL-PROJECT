@@ -42,7 +42,7 @@ export default function Navbar() {
             alt="Din express logo"
             height={250}
           />
-          <div className="ps-2.5 hidden sm:block">{`${
+          <div className="ps-2.5 hidden sm:hidden">{`${
             empresa != null ? `| ${empresa}` : ""
           }`}</div>
         </div>

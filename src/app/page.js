@@ -16,7 +16,7 @@ export default function Home({ children }) {
         <div className="text-center min-w-full text-center">
           {authToken != null ? (
             <h1>
-              Hola {nombreEmpleado} de {empresa}
+              Hola {nombreEmpleado}
             </h1>
           ) : (
             <h1>Te damos la bienvenida</h1>
