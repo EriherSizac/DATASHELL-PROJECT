@@ -27,7 +27,7 @@ El proyecto se organiza de la siguiente forma:
 |    |—— contrato.pdf
 |    |—— favicon.ico
 |    |—— favicon.png
-|    |—— logo.jpg
+|    |—— logo2.jpg
 |—— src
 |    |—— app
 |        |—— auth
@@ -87,7 +87,7 @@ Adentro de la carpeta `/public` tenemos los assets estáticos del sitio.
 |    |—— contrato.pdf
 |    |—— favicon.ico
 |    |—— favicon.png
-|    |—— logo.jpg
+|    |—— logo2.jpg
 ```
 Dentro de la carpeta `/src/` encontramos dos carpetas: `app` y `components`. Dentro de `/src/app` podemos encontrar la siguiente estructura:
 ```
