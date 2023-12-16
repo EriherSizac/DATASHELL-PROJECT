@@ -37,7 +37,7 @@ export default function Navbar() {
           <Image
             priority
             className="w-28"
-            src="/logo2.jpg"
+            src="/newExpress.png"
             width="500"
             alt="Din express logo"
             height={250}
