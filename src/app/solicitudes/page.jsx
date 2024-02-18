@@ -36,7 +36,7 @@ export default function Solicitudes() {
     var url =
       process.env.NEXT_PUBLIC_backEnd +
       `gerente/obtener-adelantos?monto=${monto}&estatus_adelanto=${estatus}`;
-      loadingToast("Obteniendo datos", "empleados", "pending");
+    loadingToast("Obteniendo datos", "empleados", "pending");
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -44,13 +44,13 @@ export default function Solicitudes() {
       },
     }).catch((error) => {
       console.log(error);
-      loadingToast('Error: ' + error, "empleados", "error");
+      loadingToast("Error: " + error, "empleados", "error");
     });
     if (response != null) {
       const json = await response.json();
       if (response.status == 200) {
         console.log(json);
-        loadingToast('Datos cargados', "empleados", "success");
+        loadingToast("Datos cargados", "empleados", "success");
         setAdelantos(json.DatosTabla);
         setDatosCsv(json.DatosCsv);
       } else {
@@ -60,7 +60,7 @@ export default function Solicitudes() {
         console.log(json);
         //setErrorMessage(json.error);
         setAdelantos([]);
-        loadingToast('Error: ' + json.error, "empleados", "error");
+        loadingToast("Error: " + json.error, "empleados", "error");
       }
     }
   }
@@ -165,13 +165,23 @@ export default function Solicitudes() {
                     Confirmo la cancelación de la solicitud
                   </div>
                 ) : (
-                  <div
-                    onClick={() => {
-                      pagarSolicitud(adelanto.id_adelanto);
-                    }}
-                    className="cursor-pointer rounded w-max p-2 bg-green-400 text-white"
-                  >
-                    Confirmo que fue pagado
+                  <div className="flex flex-row gap-2">
+                    <div
+                      onClick={() => {
+                        cancelarSolicitud(adelanto.id_adelanto);
+                      }}
+                      className="cursor-pointer p-2 rounded bg-red-400 text-white w-max"
+                    >
+                      Confirmo la cancelación de la solicitud
+                    </div>
+                    <div
+                      onClick={() => {
+                        pagarSolicitud(adelanto.id_adelanto);
+                      }}
+                      className="cursor-pointer rounded w-max p-2 bg-green-400 text-white"
+                    >
+                      Confirmo que fue pagado
+                    </div>
                   </div>
                 )
               ) : (
@@ -318,7 +328,7 @@ export default function Solicitudes() {
     },
     {
       accessorKey: "id_empleado",
-      header: "Acción",
+      header: "Cancelar pago",
       // configuramos las acciones dependiendo del estado
       cell: ({ row }) => {
         return (
@@ -329,9 +339,27 @@ export default function Solicitudes() {
                 setAccionEmpleado(row.index);
               }}
             >
-              {privilegios == "operador"
-                ? "Cancelar pago"
-                : privilegios == "gerente" && "Pagar"}
+              Cancelar pago
+            </div>
+          )
+        );
+      },
+    },
+    
+    {
+      accessorKey: "id_empleado",
+      header: "Pagar",
+      // configuramos las acciones dependiendo del estado
+      cell: ({ row }) => {
+        return (
+          row.getValue("estatus_adelanto") === "creado" && (
+            <div
+              className="p-2 cursor-pointer hover:font-semibold hover:italic"
+              onClick={() => {
+                setAccionEmpleado(row.index);
+              }}
+            >
+              {privilegios == "gerente" && "Pagar"}
             </div>
           )
         );

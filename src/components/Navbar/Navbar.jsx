@@ -13,7 +13,7 @@ export default function Navbar() {
 
   // Nav menu mobile
   function toggleNavigationPanel() {
-    console.log(mobileNavVisibility)
+    console.log(mobileNavVisibility);
     if (mobileNavVisibility == "hidden") {
       setMobileNavVisibility("flex");
     } else {
@@ -49,7 +49,10 @@ export default function Navbar() {
         <div className="flex flex-row justify-evenly max-width-ful hidden lg:block">
           <div className="flex flex-row justify-between gap-4 items-center">
             {privilegios == "gerente" && (
-              <Link className="text-center hover:text-yellow-400" href="/operadores">
+              <Link
+                className="text-center hover:text-yellow-400"
+                href="/operadores"
+              >
                 Operadores
               </Link>
             )}
@@ -84,7 +87,10 @@ export default function Navbar() {
               ""
             )}
             {privilegios == "gerente" && (
-              <Link href="/reportes" className="text-center hover:text-yellow-400">
+              <Link
+                href="/reportes"
+                className="text-center hover:text-yellow-400"
+              >
                 {" "}
                 Reportes
               </Link>
@@ -106,19 +112,23 @@ export default function Navbar() {
           >
             Menú
           </div>
-        ) : (
+        ) : location.pathname != "/tyc" ? (
           <Link
             className="bg-black text-white px-3 py-2 min-w-fit cursor-pointer "
             href="/auth/login"
           >
             Entrar a mi cuenta
           </Link>
-        )}
+        ) : null}
       </div>
       <div
         className={`${mobileNavVisibility} absolute z-50 flex-col justify-top pt-20 gap-4 items-center absolute inset-0 bg-black text-white`}
       >
-        <MenuPrincipal fun={()=>{toggleNavigationPanel()}} />
+        <MenuPrincipal
+          fun={() => {
+            toggleNavigationPanel();
+          }}
+        />
         <div
           className="absolute top-0 right-0 pr-3 pt-3 cursor-pointer"
           onClick={toggleNavigationPanel}
