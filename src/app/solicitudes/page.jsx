@@ -345,7 +345,7 @@ export default function Solicitudes() {
         );
       },
     },
-    
+
     {
       accessorKey: "id_empleado",
       header: "Pagar",
