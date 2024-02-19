@@ -10,6 +10,7 @@ export default function Navbar() {
   const [mobileNavVisibility, setMobileNavVisibility] = useState("hidden");
   const router = useRouter();
   const { privilegios, authToken, empresa, closeSession } = useAuth();
+  const [whereAt, setWhereAt] = useState();
 
   // Nav menu mobile
   function toggleNavigationPanel() {
@@ -24,6 +25,10 @@ export default function Navbar() {
   function endSession() {
     closeSession();
   }
+
+  useEffect(()=>{
+    setWhereAt(location.pathname);
+  })
 
   return (
     <div>
@@ -112,7 +117,7 @@ export default function Navbar() {
           >
             Menú
           </div>
-        ) : location.pathname != "/tyc" ? (
+        ) : whereAt != "/tyc" ? (
           <Link
             className="bg-black text-white px-3 py-2 min-w-fit cursor-pointer "
             href="/auth/login"
