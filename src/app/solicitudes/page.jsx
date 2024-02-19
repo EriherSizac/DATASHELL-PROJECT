@@ -340,8 +340,8 @@ export default function Solicitudes() {
       // configuramos las acciones dependiendo del estado
       cell: ({ row }) => {
         return (
-          row.getValue("estatus_adelanto") === "creado" ||
-          (row.getValue("estatus_adelanto") === null && (
+          row.getValue("estatus_adelanto") == "creado" ||
+          row.getValue("estatus_adelanto") == null ? (
             <div className="flex flex-col gap-2">
               <div
                 className="p-2 cursor-pointer hover:font-semibold hover:italic"
@@ -349,10 +349,10 @@ export default function Solicitudes() {
                   setAccionEmpleado(row.index);
                 }}
               >
-                Acciones {accionEmpleado}
+                Acciones
               </div>
             </div>
-          ))
+          ): ''
         );
       },
     },
