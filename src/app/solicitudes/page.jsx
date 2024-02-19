@@ -36,12 +36,18 @@ export default function Solicitudes() {
     var url =
       process.env.NEXT_PUBLIC_backEnd +
       `gerente/obtener-adelantos?monto=${monto}&estatus_adelanto=${estatus}`;
+    console.log(url);
     loadingToast("Obteniendo datos", "empleados", "pending");
     const response = await fetch(url, {
       method: "GET",
-      headers: {
+      headers: new Headers({
+        "ngrok-skip-browser-warning": "69420",
         "Content-Type": "application/json",
-      },
+      }),
+      //{
+      //"Content-Type": "application/json",
+
+      //},
     }).catch((error) => {
       console.log(error);
       loadingToast("Error: " + error, "empleados", "error");
@@ -70,9 +76,10 @@ export default function Solicitudes() {
     var url = process.env.NEXT_PUBLIC_backEnd + `operador/cancelar-adelanto`;
     const response = await fetch(url, {
       method: "POST",
-      headers: {
+      headers: new Headers({
+        "ngrok-skip-browser-warning": "69420",
         "Content-Type": "application/json",
-      },
+      }),
       body: JSON.stringify({
         id: id,
       }),
@@ -102,9 +109,10 @@ export default function Solicitudes() {
     var url = process.env.NEXT_PUBLIC_backEnd + `gerente/pagar-adelanto`;
     const response = await fetch(url, {
       method: "POST",
-      headers: {
+      headers: new Headers({
+        "ngrok-skip-browser-warning": "69420",
         "Content-Type": "application/json",
-      },
+      }),
       body: JSON.stringify({
         id: id,
       }),
@@ -154,7 +162,7 @@ export default function Solicitudes() {
                 <div className="font-bold">Monto:</div> ${adelanto.monto}
                 <div className="font-bold">Solicitado en:</div> {adelanto.fecha}
               </div>
-              {adelanto.estatus_adelanto == "creado" ? (
+              {adelanto.estatus_adelanto == "creado" || adelanto.estatus_adelanto == null ? (
                 privilegios == "operador" ? (
                   <div
                     onClick={() => {
@@ -162,7 +170,7 @@ export default function Solicitudes() {
                     }}
                     className="cursor-pointer p-2 rounded bg-red-400 text-white w-max"
                   >
-                    Confirmo la cancelación de la solicitud
+                    Cancelar solicitud
                   </div>
                 ) : (
                   <div className="flex flex-row gap-2">
@@ -172,7 +180,7 @@ export default function Solicitudes() {
                       }}
                       className="cursor-pointer p-2 rounded bg-red-400 text-white w-max"
                     >
-                      Confirmo la cancelación de la solicitud
+                      Cancelar solicitud
                     </div>
                     <div
                       onClick={() => {
@@ -180,7 +188,7 @@ export default function Solicitudes() {
                       }}
                       className="cursor-pointer rounded w-max p-2 bg-green-400 text-white"
                     >
-                      Confirmo que fue pagado
+                      Marcar pagado
                     </div>
                   </div>
                 )
@@ -328,40 +336,23 @@ export default function Solicitudes() {
     },
     {
       accessorKey: "id_empleado",
-      header: "Cancelar pago",
+      header: "Acciones",
       // configuramos las acciones dependiendo del estado
       cell: ({ row }) => {
         return (
-          row.getValue("estatus_adelanto") === "creado" && (
-            <div
-              className="p-2 cursor-pointer hover:font-semibold hover:italic"
-              onClick={() => {
-                setAccionEmpleado(row.index);
-              }}
-            >
-              Cancelar pago
+          row.getValue("estatus_adelanto") === "creado" ||
+          (row.getValue("estatus_adelanto") === null && (
+            <div className="flex flex-col gap-2">
+              <div
+                className="p-2 cursor-pointer hover:font-semibold hover:italic"
+                onClick={() => {
+                  setAccionEmpleado(row.index);
+                }}
+              >
+                Acciones {accionEmpleado}
+              </div>
             </div>
-          )
-        );
-      },
-    },
-
-    {
-      accessorKey: "id_empleado",
-      header: "Pagar",
-      // configuramos las acciones dependiendo del estado
-      cell: ({ row }) => {
-        return (
-          row.getValue("estatus_adelanto") === "creado" && (
-            <div
-              className="p-2 cursor-pointer hover:font-semibold hover:italic"
-              onClick={() => {
-                setAccionEmpleado(row.index);
-              }}
-            >
-              {privilegios == "gerente" && "Pagar"}
-            </div>
-          )
+          ))
         );
       },
     },
