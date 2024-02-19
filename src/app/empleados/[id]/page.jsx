@@ -35,6 +35,7 @@ export default function NuevoEmpleado() {
   const [currentBanco, setCurrentBanco] = useState("");
   const bancoRef = useRef();
   const params = useParams();
+  const [eliminarMessage, setEliminarMessage] = useState("Eliminar empleado");
 
   // Función que obtiene la información de un empleado
   const fetchData = async () => {
@@ -72,13 +73,47 @@ export default function NuevoEmpleado() {
     id != null && fetchData();
   }, [id]);
 
-
   // Verificamos los privilegios del usuario y obtenemos el id
   useEffect(() => {
-    privilegios != "gerente" && router.push("/");
+    setTimeout(()=>{
+      //privilegios != "gerente" && router.push("/")
+    }, 1500);
     id == null && setId(params.id.toString());
   }, []);
 
+  async function eliminarEmpleado() {
+    var url = process.env.NEXT_PUBLIC_backEnd + "gerente/eliminar-empleado";
+    var authToken = localStorage.getItem("authToken");
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({
+        id:id
+      }),
+    }).catch((error) => {
+      console.log(error);
+    });
+    if (response != null) {
+      if (response.status == 200) {
+        console.log(response.body);
+        setMessage("Eliminado con éxito. Limpiando...");
+        setTimeout(() => {
+          limpiarCampos();
+        }, 1500);
+        router.push("/empleados");
+      } else {
+        const json = await response.json();
+        console.log(json);
+        setMessage(json.error);
+        setTimeout(() => {
+          setMessage("");
+        }, 2500);
+      }
+    }
+  }
 
   // Función que obtiene todos los bancos disponibles y los coloca en el dropdown
   async function getBancos() {
@@ -233,7 +268,7 @@ export default function NuevoEmpleado() {
     setDireccion(e.target.value);
   }
 
-  // Funciópn que actualiza el estado del código de país del empleado  
+  // Funciópn que actualiza el estado del código de país del empleado
   function handleCountryCode(e) {
     setCountrCode(e.target.value);
   }
@@ -385,6 +420,15 @@ export default function NuevoEmpleado() {
             >
               Limpiar formulario
             </button>
+            <button
+              className="bg-red-600 p-4 text-white w-full border border-black hover:bg-red-700 transition-all ease duration-200"
+              onClick={(e) => {
+                e.preventDefault();
+                setMessage('Confirmar eliminación')
+              }}
+            >
+              {eliminarMessage}
+            </button>
           </div>
           <div>{message}</div>
         </form>
@@ -396,7 +440,10 @@ export default function NuevoEmpleado() {
         }}
         buttonCloseText={`Volver al formulario`}
         modalHeader={message}
-      ></Modal>
+      >
+        <div className="px-4 text-center">Presiona el botón de abajo si quieres eliminar el usuario {nombreCompleto}</div>
+        <button className="bg-red-700 text-white hover:bg-red-800 py-2 px-4 transition-all ease duration-200" onClick={()=>{eliminarEmpleado();}}> Confirmar eliminacion </button>
+      </Modal>
     </div>
   );
 }
