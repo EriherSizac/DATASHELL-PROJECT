@@ -116,7 +116,7 @@ export default function EditarOperador() {
   async function eliminarOperador(e) {
     e != undefined && e.preventDefault();
     if ((nombreCompleto != "") & (username != "")) {
-      var url = process.env.NEXT_PUBLIC_backEnd + "gerente/editar-operador";
+      var url = process.env.NEXT_PUBLIC_backEnd + "gerente/eliminar-operador";
       console.log(url);
       var authToken = localStorage.getItem("authToken");
       const body = {
