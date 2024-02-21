@@ -46,16 +46,15 @@ export default function EditarOperador() {
         console.log(data);
         setNombreCompleto(data.nombre);
         setUsername(data.username);
-      }else{
+      } else {
         // sino, mostramos mensaje y vamos para atrás.
-        toast('Este operador no existe. Redirigiendo...');
+        toast("Este operador no existe. Redirigiendo...");
         router.back();
       }
     } catch (error) {
       console.log(error);
     }
   };
-
 
   useEffect(() => {
     // obtenemos los datos si aún no se ha hecho
@@ -115,42 +114,39 @@ export default function EditarOperador() {
   // función que elimina un operador
   async function eliminarOperador(e) {
     e != undefined && e.preventDefault();
-    if ((nombreCompleto != "") & (username != "")) {
-      var url = process.env.NEXT_PUBLIC_backEnd + "gerente/eliminar-operador";
-      console.log(url);
-      var authToken = localStorage.getItem("authToken");
-      const body = {
-        id: id,
-      };
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify(body),
-      }).catch((error) => {
-        console.log("error", error);
-      });
-      if (response != null) {
-        if (response.status == 200) {
-          console.log(response.body);
-          toast("Operador eliminado con éxito.");
-          setTimeout(() => {
-            router.push("/operadores");
-          }, 1000);
-        } else {
-          const json = await response.json();
-          console.log(json);
-          setMessage(json.error);
-          setTimeout(() => {
-            router.push("/operadores");
-          }, 1000);
-        }
+    var url = process.env.NEXT_PUBLIC_backEnd + "gerente/eliminar-operador";
+    console.log(url);
+    var authToken = localStorage.getItem("authToken");
+    const body = {
+      id: id,
+    };
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify(body),
+    }).catch((error) => {
+      console.log("error", error);
+    });
+    if (response != null) {
+      if (response.status == 200) {
+        console.log(response.body);
+        toast("Operador eliminado con éxito.");
+        setTimeout(() => {
+          router.push("/operadores");
+        }, 1000);
+      } else {
+        const json = await response.json();
+        console.log(json);
+        setMessage(json.error);
+        setTimeout(() => {
+          router.push("/operadores");
+        }, 1000);
       }
-    } else {
-      toast("Rellena todos los campos");
     }
   }
 
